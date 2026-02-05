@@ -35,17 +35,31 @@ function App() {
     fetchChats();
   }, []);
 
+  // Először mentsük el a tokent a login után egy state-be
+  const [idToken, setIdToken] = useState(null);
+  
+  const handleSuccess = (credentialResponse) => {
+    const decoded = jwtDecode(credentialResponse.credential);
+    setUser(decoded);
+    setIdToken(credentialResponse.credential); // Ezt fogjuk küldeni a backendnek
+    setFormData(prev => ({ ...prev, email: decoded.email }));
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(API_URL, formData);
+      await axios.post(API_URL, formData, {
+        headers: {
+          Authorization: `Bearer ${idToken}` // Token küldése a fejlécben
+        }
+      });
       setFormData(prev => ({ ...prev, question: '', answer: '' }));
       await fetchChats();
     } catch (err) {
-      console.error("Hiba a mentésnél", err);
+        console.error("Hiba a mentésnél", err);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
