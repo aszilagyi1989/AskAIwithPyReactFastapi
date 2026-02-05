@@ -79,7 +79,7 @@ function App() {
         {/* Beküldő Form */}
         <section className="lg:col-span-1">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 className="text-lg font-bold mb-4 border-b pb-2">Új naplózás</h2>
+            <h2 className="text-lg font-bold mb-4 border-b pb-2">Chat</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input className="w-full p-2 border rounded bg-gray-100 outline-none" value={formData.email} readOnly />
               <select className="w-full p-2 border rounded outline-none" value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})}>
@@ -91,7 +91,7 @@ function App() {
               <textarea placeholder="Kérdés" className="w-full p-2 border rounded h-20 outline-none" value={formData.question} onChange={e => setFormData({...formData, question: e.target.value})} required />
               {/*<textarea placeholder="AI Válasza" className="w-full p-2 border rounded h-32 outline-none" value={formData.answer} onChange={e => setFormData({...formData, answer: e.target.value})} required />*/}
               <button disabled={!user || loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
-                {loading ? 'Mentés...' : 'Adat Mentése'}
+                {loading ? 'Thinking...' : 'Answer me!'}
               </button>
             </form>
           </div>
@@ -100,10 +100,10 @@ function App() {
         {/* Adatbázis Lista */}
         <section className="lg:col-span-2">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold">PostgreSQL Adatok</h2>
+            <h2 className="text-xl font-bold">Messages</h2>
             {user && (
               <button onClick={fetchChats} disabled={fetching} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                {fetching ? 'Betöltés...' : 'Adatok lekérése'}
+                {fetching ? 'Loading...' : 'Data fetching'}
               </button>
             )}
           </div>
