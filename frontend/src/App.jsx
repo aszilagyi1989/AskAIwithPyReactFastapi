@@ -13,7 +13,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [formData, setFormData] = useState({
-    email: '', model: 'gpt-5.2', question: '' 
+    email: '', model: '', question: '' 
   });
 /*, answer: ''*/
   const handleSuccess = (credentialResponse) => {
