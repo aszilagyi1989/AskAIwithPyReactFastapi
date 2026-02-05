@@ -1,10 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode"; // Ezt is add a package.json-höz!
 
 // Cseréld ki a saját Render backend URL-edre!
 const API_URL = "https://askaiwithpyreactfastapibackend.onrender.com";
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  const handleSuccess = (credentialResponse) => {
+    const decoded = jwtDecode(credentialResponse.credential);
+    setUser(decoded);
+    setFormData({ ...formData, email: decoded.email }); // Automatikusan kitölti az emailt
+  };
+
+  return (
+    <div>
+      {!user ? (
+        <div className="flex justify-center p-10">
+          <GoogleLogin onSuccess={handleSuccess} onError={() => console.log('Hiba!')} />
+        </div>
+      ) : (
+        <div className="p-4 flex justify-between items-center bg-gray-100">
+           <span>Bejelentkezve: {user.name}</span>
+           <button onClick={() => { googleLogout(); setUser(null); }} className="text-red-500">Kijelentkezés</button>
+        </div>
+      )}
+      
   const [chats, setChats] = useState([]);
   const [formData, setFormData] = useState({
     email: '', model: 'gpt-4', question: '', answer: ''
@@ -140,8 +163,13 @@ function App() {
         </section>
 
       </main>
+      
+        </div>
+      );
     </div>
   );
+  
+
 }
 
 export default App;
