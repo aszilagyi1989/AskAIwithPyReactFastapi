@@ -16,7 +16,7 @@ app = FastAPI()
 
 app.add_middleware(
   CORSMiddleware,
-  allow_origins = ["https://askaiwithpy.onrender.com/"],
+  allow_origins = ["https://askaiwithpy.onrender.com"],
   allow_credentials = True,
   allow_methods = ["*"],
   allow_headers = ["*"],
@@ -63,13 +63,16 @@ def create_chat(
     raise HTTPException(status_code = 403, detail = "Emailek nem egyeznek")
 
   try:
+    print(chat.model)
+    print(chat.question)
+    print(chat.email)
     # 1. AI Válasz generálása
     response = client.chat.completions.create(
       model = chat.model, 
       messages = [{"role": "user", "content": chat.question}]
     )
     ai_answer = response.choices[0].message.content
-
+    print(ai_answer)
     # 2. Mentés az adatbázisba (az AI válasszal kiegészítve)
     db_chat = Chat(
       email = chat.email,
