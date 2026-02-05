@@ -7,8 +7,10 @@ from pydantic import BaseModel
 from google.oauth2 import id_token
 from google.auth.transport import requests
 import os
+from openai import OpenAI
 
 GOOGLE_CLIENT_ID = os.environ.get("CLIENT_ID")
+client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI()
 
@@ -25,7 +27,7 @@ class ChatSchema(BaseModel):
   email: str
   model: str
   question: str
-  answer: str
+  # answer: str
 
 def get_db():
   db = SessionLocal()
@@ -51,7 +53,7 @@ def create_chat(
   authorization: str = Header(None) # Fejlécből olvassuk a tokent
 ):
   if not authorization or not authorization.startswith("Bearer "):
-    raise HTTPException(status_code = 401, detail = "Hiányzó hitelesítés")
+    raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
     
   token = authorization.split(" ")[1]
   user_data = verify_google_token(token)
@@ -60,12 +62,35 @@ def create_chat(
   if user_data['email'] != chat.email:
     raise HTTPException(status_code = 403, detail = "Emailek nem egyeznek")
 
-  db_chat = Chat(**chat.dict())
-  db.add(db_chat)
-  db.commit()
-  return db_chat
+  try:
+    # 1. AI Válasz generálása
+    response = client.chat.completions.create(
+      model = chat.model, 
+      messages = [{"role": "user", "content": chat.question}]
+    )
+    ai_answer = response.choices[0].message.content
+
+    # 2. Mentés az adatbázisba (az AI válasszal kiegészítve)
+    db_chat = Chat(
+      email = chat.email,
+      model = chat.model,
+      question = chat.question,
+      answer = ai_answer
+    )
+    db.add(db_chat)
+    db.commit()
+    db.refresh(db_chat)
+    return db_chat
+
+  except Exception as e:
+    print(f"OpenAI hiba: {e}")
+    raise HTTPException(status_code = 500, detail = "Hiba az AI válasz generálása közben")
 
 
 @app.get("/chats/")
 def read_chats(db: Session = Depends(get_db)):
   return db.query(Chat).all()
+
+@app.get("/")
+def home():
+    return {"status": "A backend fut!", "endpoint": "/chats/"}

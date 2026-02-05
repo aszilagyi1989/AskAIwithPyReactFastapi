@@ -13,7 +13,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [formData, setFormData] = useState({
-    email: '', model: 'gpt-4', question: '', answer: ''
+    email: '', model: 'gpt-5.2', question: '' //, answer: ''
   });
 
   const handleSuccess = (credentialResponse) => {
@@ -47,10 +47,11 @@ function App() {
       await axios.post(API_URL, formData, {
         headers: { Authorization: `Bearer ${idToken}` }
       });
-      setFormData(prev => ({ ...prev, question: '', answer: '' }));
-      alert("Sikeres mentés!");
+      setFormData(prev => ({ ...prev, question: ''})); //, answer: '' 
+      alert("AI Válasz megérkezett és mentve!");
+      fetchChats();
     } catch (err) {
-      alert("Hiba a mentésnél.");
+      alert("Hiba történt a generálás során.");
     } finally {
       setLoading(false);
     }
@@ -81,11 +82,13 @@ function App() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <input className="w-full p-2 border rounded bg-gray-100 outline-none" value={formData.email} readOnly />
               <select className="w-full p-2 border rounded outline-none" value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})}>
-                <option value="gpt-4">GPT-4</option>
-                <option value="claude-3">Claude 3</option>
+                <option value="gpt-5.2">gpt-5.2</option>
+                <option value="gpt-5">gpt-5</option>
+                <option value="gpt-5-mini">gpt-5-mini</option>
+                <option value="gpt-5-nano">gpt-5-nano</option>
               </select>
               <textarea placeholder="Kérdés" className="w-full p-2 border rounded h-20 outline-none" value={formData.question} onChange={e => setFormData({...formData, question: e.target.value})} required />
-              <textarea placeholder="AI Válasza" className="w-full p-2 border rounded h-32 outline-none" value={formData.answer} onChange={e => setFormData({...formData, answer: e.target.value})} required />
+              //<textarea placeholder="AI Válasza" className="w-full p-2 border rounded h-32 outline-none" value={formData.answer} onChange={e => setFormData({...formData, answer: e.target.value})} required />
               <button disabled={!user || loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
                 {loading ? 'Mentés...' : 'Adat Mentése'}
               </button>

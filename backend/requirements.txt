@@ -1,6 +1,7 @@
 fastapi
 google-auth
 google-auth-library
+openai
 psycopg2
 pydantic
 sqlalchemy
