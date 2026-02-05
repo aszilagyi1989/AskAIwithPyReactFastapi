@@ -4,7 +4,7 @@ import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 
 // Figyelem: A végén ott kell legyen a /chats/
-const API_URL = "https://askaiwithpyreactfastapibackend.onrender.com";
+const API_URL = "https://askaiwithpyreactfastapibackend.onrender.com/chats/";
 
 function App() {
   const [user, setUser] = useState(null);
