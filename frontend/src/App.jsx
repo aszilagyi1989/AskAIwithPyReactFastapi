@@ -62,7 +62,7 @@ function App() {
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
       <header className="bg-slate-900 text-white shadow-lg py-4">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold tracking-tight">AI History Cloud</h1>
+          <h1 className="text-xl font-bold tracking-tight">Ask AI with Python</h1>
           {!user ? (
             <GoogleLogin onSuccess={handleSuccess} onError={() => alert("Login Failed")} />
           ) : (
