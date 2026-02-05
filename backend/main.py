@@ -66,7 +66,8 @@ def create_chat(
     # 1. AI Válasz generálása
     response = client.chat.completions.create(
       model = chat.model, 
-      messages = [{"role": "user", "content": chat.question}]
+      messages = [{"role": "system", "content": "You are a helpful assistant. Answer as short as possible."}, {"role": "user", "content": question}], 
+      temperature = 0
     )
     ai_answer = response.choices[0].message.content
     
