@@ -3,6 +3,7 @@ google-auth
 openai
 psycopg2
 pydantic
+requests
 sqlalchemy
 typing
 uvicorn
