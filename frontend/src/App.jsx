@@ -13,9 +13,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [formData, setFormData] = useState({
-    email: '', model: 'gpt-5.2', question: '' //, answer: ''
+    email: '', model: 'gpt-5.2', question: '' 
   });
-
+/*, answer: ''*/
   const handleSuccess = (credentialResponse) => {
     const token = credentialResponse.credential;
     const decoded = jwtDecode(token);
@@ -47,7 +47,8 @@ function App() {
       await axios.post(API_URL, formData, {
         headers: { Authorization: `Bearer ${idToken}` }
       });
-      setFormData(prev => ({ ...prev, question: ''})); //, answer: '' 
+      setFormData(prev => ({ ...prev, question: ''})); 
+      //, answer: ''
       alert("AI Válasz megérkezett és mentve!");
       fetchChats();
     } catch (err) {
@@ -88,7 +89,7 @@ function App() {
                 <option value="gpt-5-nano">gpt-5-nano</option>
               </select>
               <textarea placeholder="Kérdés" className="w-full p-2 border rounded h-20 outline-none" value={formData.question} onChange={e => setFormData({...formData, question: e.target.value})} required />
-              //<textarea placeholder="AI Válasza" className="w-full p-2 border rounded h-32 outline-none" value={formData.answer} onChange={e => setFormData({...formData, answer: e.target.value})} required />
+              {/*<textarea placeholder="AI Válasza" className="w-full p-2 border rounded h-32 outline-none" value={formData.answer} onChange={e => setFormData({...formData, answer: e.target.value})} required />*/}
               <button disabled={!user || loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
                 {loading ? 'Mentés...' : 'Adat Mentése'}
               </button>
