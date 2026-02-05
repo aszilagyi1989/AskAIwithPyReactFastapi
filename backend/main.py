@@ -52,27 +52,24 @@ def create_chat(
   db: Session = Depends(get_db), 
   authorization: str = Header(None) # Fejlécből olvassuk a tokent
 ):
+  print(f"DEBUG: Beérkező adat: {chat.dict()}")
   if not authorization or not authorization.startswith("Bearer "):
     raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
-    
-  token = authorization.split(" ")[1]
-  user_data = verify_google_token(token)
+  
+  user_data = verify_google_token(authorization)
     
   # Biztonsági ellenőrzés: Csak a saját emailjével menthet
   if user_data['email'] != chat.email:
     raise HTTPException(status_code = 403, detail = "Emailek nem egyeznek")
 
   try:
-    print(chat.model)
-    print(chat.question)
-    print(chat.email)
     # 1. AI Válasz generálása
     response = client.chat.completions.create(
       model = chat.model, 
       messages = [{"role": "user", "content": chat.question}]
     )
     ai_answer = response.choices[0].message.content
-    print(ai_answer)
+    
     # 2. Mentés az adatbázisba (az AI válasszal kiegészítve)
     db_chat = Chat(
       email = chat.email,
