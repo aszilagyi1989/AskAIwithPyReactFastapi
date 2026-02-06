@@ -142,7 +142,7 @@ function App() {
             {user && (
               <div className = "flex gap-2">
                 <button onClick = {downloadCSV} className = "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
-                  CSV Letöltés
+                  Download CSV
                 </button>
                 <button onClick = {fetchChats} disabled={fetching} className="bg-emerald-600 hover: bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
                   {fetching ? 'Loading...' : 'Data fetching'}

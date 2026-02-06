@@ -65,7 +65,7 @@ def create_chat(
   try:
     
     if chat.model != "gpt-5.2":
-      degree = 0.1
+      degree = 1
     else:
       degree = 0
     # 1. AI Válasz generálása
