@@ -141,7 +141,7 @@ function App() {
           ) : (
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">{user.name}</span>
-              <button onClick={() => { googleLogout(); setUser(null); setIdToken(null); setChats([]); }} 
+              <button onClick={() => { googleLogout(); setUser(null); setIdToken(null); setChats([]); setImages([]); }} 
                       className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Kijelentkezés</button>
             </div>
           )}
@@ -149,83 +149,84 @@ function App() {
       </header>
 
       <main className="container mx-auto px-4 py-8 grid lg:grid-cols-3 gap-8">
-        {/* Beküldő Form */}
-        <section className="lg:col-span-1">
+        
+        {/* BAL OLDAL: Űrlapok */}
+        <section className="lg:col-span-1 space-y-6">
+          {/* Chat Form */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
             <h2 className="text-lg font-bold mb-4 border-b pb-2">Chat</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input className="w-full p-2 border rounded bg-gray-100 outline-none" value={formData.email} readOnly />
+              <input className="w-full p-2 border rounded bg-gray-100 outline-none text-xs" value={formData.email} readOnly />
               <select className="w-full p-2 border rounded outline-none" value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})}>
-                <option value="gpt-5.2">gpt-5.2</option>
-                <option value="gpt-5">gpt-5</option>
-                <option value="gpt-5-mini">gpt-5-mini</option>
-                <option value="gpt-5-nano">gpt-5-nano</option>
+                <option value="gpt-4o-mini">gpt-4o-mini</option>
+                <option value="gpt-4o">gpt-4o</option>
               </select>
               <textarea placeholder="Kérdés" className="w-full p-2 border rounded h-20 outline-none" value={formData.question} onChange={e => setFormData({...formData, question: e.target.value})} required />
-              {/*<textarea placeholder="AI Válasza" className="w-full p-2 border rounded h-32 outline-none" value={formData.answer} onChange={e => setFormData({...formData, answer: e.target.value})} required />*/}
               <button disabled={!user || loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
                 {loading ? 'Thinking...' : 'Answer me!'}
               </button>
             </form>
           </div>
-        </section>
 
-        {/* Adatbázis Lista */}
-        <section className="lg:col-span-2">
-          <div className = "flex justify-between items-center mb-6">
-            <h2 className = "text-xl font-bold">Messages</h2>
-            {user && (
-              <div className = "flex gap-2">
-                <button onClick = {downloadCSV} className = "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
-                  Download CSV
-                </button>
-                <button onClick = {fetchChats} disabled={fetching} className="bg-emerald-600 hover: bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                  {fetching ? 'Loading...' : 'Data fetching'}
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-4">
-            {chats.map(chat => (
-              <div key={chat.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <div className="flex justify-between text-[10px] text-gray-400 mb-2 font-bold uppercase">
-                  <span className="text-emerald-600">{chat.model}</span>
-                  <span>{new Date(chat.date).toLocaleString('hu-HU')}</span>
-                </div>
-                <p className="font-semibold text-gray-800 mb-2">{chat.question}</p>
-                <div className="bg-emerald-50 p-3 rounded-lg text-sm border-l-4 border-emerald-400">{chat.answer}</div>
-              </div>
-            ))}
-          </div>
-          
-            {/* Képgeneráló Form */}
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-6">
-            <h2 className="text-lg font-bold mb-4">Image Generator</h2>
+          {/* Image Form */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 className="text-lg font-bold mb-4 border-b pb-2">Image Generator</h2>
             <form onSubmit={handleImageSubmit} className="space-y-4">
-              <select className="w-full p-2 border rounded" value={imageFormData.model} onChange={e => setImageFormData({...imageFormData, model: e.target.value})}>
+              <select className="w-full p-2 border rounded outline-none" value={imageFormData.model} onChange={e => setImageFormData({...imageFormData, model: e.target.value})}>
                 <option value="dall-e-3">DALL-E 3</option>
-                <option value="chatgpt-image-latest">chatgpt-image-latest</option>
-                <option value="gpt-image-1.5">gpt-image-1.5</option>
-                <option value="gpt-image-1">gpt-image-1</option>
-                <option value="gpt-image-1-mini">gpt-image-1-mini</option>
+                <option value="dall-e-2">DALL-E 2</option>
               </select>
-              <textarea placeholder="Kép leírása..." className="w-full p-2 border rounded" value={imageFormData.description} onChange={e => setImageFormData({...imageFormData, description: e.target.value})} required />
-              <button disabled={!user || imageLoading} className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">
+              <textarea placeholder="Kép leírása (Prompt)" className="w-full p-2 border rounded h-20 outline-none" value={imageFormData.description} onChange={e => setImageFormData({...imageFormData, description: e.target.value})} required />
+              <button disabled={!user || imageLoading} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
                 {imageLoading ? 'Generating...' : 'Generate Image'}
               </button>
             </form>
-          </section>
-          
-          {/* Galéria megjelenítése */}
-          <div className="grid grid-cols-2 gap-4 mt-8">
-            {images.map(img => (
-              <div key={img.id} className="border rounded-xl overflow-hidden bg-white shadow-sm">
-                <img src={img.image} alt={img.description} className="w-full h-48 object-cover" />
-                <div className="p-2 text-xs text-gray-500">{img.description}</div>
-              </div>
-            ))}
           </div>
+        </section>
+
+        {/* JOBB OLDAL: Eredmények */}
+        <section className="lg:col-span-2 space-y-12">
+          
+          {/* Chat Üzenetek */}
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold">Messages</h2>
+              {user && (
+                <div className="flex gap-2">
+                  <button onClick={downloadCSV} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">Download CSV</button>
+                  <button onClick={fetchChats} disabled={fetching} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition">
+                    {fetching ? 'Loading...' : 'Refresh'}
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+              {chats.map(chat => (
+                <div key={chat.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                  <div className="flex justify-between text-[10px] text-gray-400 mb-2 font-bold uppercase">
+                    <span className="text-emerald-600">{chat.model}</span>
+                    <span>{new Date(chat.date).toLocaleString('hu-HU')}</span>
+                  </div>
+                  <p className="font-semibold text-gray-800 mb-2">{chat.question}</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg text-sm border-l-4 border-emerald-400">{chat.answer}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Képek Galéria */}
+          <div>
+            <h2 className="text-xl font-bold mb-6">Generated Images</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {images.map(img => (
+                <div key={img.id} className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                  <img src={img.image} alt={img.description} className="w-full h-48 object-cover rounded-lg mb-2" />
+                  <p className="text-[11px] text-gray-600 italic px-1 line-clamp-2">{img.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </section>
       </main>
     </div>
