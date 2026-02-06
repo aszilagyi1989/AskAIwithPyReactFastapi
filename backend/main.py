@@ -1,8 +1,7 @@
+from database import SessionLocal, Chat, Image, Video
 from fastapi import FastAPI, Depends, HTTPException, Header
-from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from database import SessionLocal, Chat, Image
 from pydantic import BaseModel
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
@@ -41,13 +40,16 @@ class ChatSchema(BaseModel):
   email: str
   model: str
   question: str
-  # answer: str
 
 class ImageSchema(BaseModel):
   email: str
   model: str
   description: str
-  # answer: str
+  
+class VideoSchema(BaseModel):
+  email: str
+  model: str
+  content: str
 
 
 def get_db():
@@ -170,6 +172,64 @@ def create_image(
   except Exception as e:
     print(f"OpenAI hiba: {e}")
     raise HTTPException(status_code = 500, detail = "Hiba az AI válasz generálása közben")
+
+
+@app.post("/videos/")
+def create_videos(
+  video: VideoSchema, 
+  db: Session = Depends(get_db), 
+  authorization: str = Header(None) # Fejlécből olvassuk a tokent
+):
+  print(f"DEBUG: Beérkező adat: {vidoe.dict()}")
+  if not authorization or not authorization.startswith("Bearer "):
+    raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
+  
+  user_data = verify_google_token(authorization)
+    
+  # Biztonsági ellenőrzés: Csak a saját emailjével menthet
+  if user_data['email'] != image.email:
+    raise HTTPException(status_code = 403, detail = "Emailek nem egyeznek")
+
+  try:
+  #   
+  #   response = client.images.generate(
+  #     model = image.model, 
+  #     prompt = image.description
+  #   )
+  #   
+  #   now = datetime.now().strftime('%Y%m%d%H%M%S')
+  #   filename = 'image' + now + '.png'
+  #   
+  #   if image.model == 'dall-e-3':
+  #     link = response.data[0].url
+  #     r = py_requests.get(link)
+  #     image_bytes = BytesIO(r.content)
+  #   else:
+  #     image_base64 = response.data[0].b64_json
+  #     image_bytes = base64.b64decode(image_base64)
+  #     image_bytes = BytesIO(image_bytes)
+  #     
+  #   s3.put_object(
+  #     Bucket = 'askaiwithpy', 
+  #     Key = filename, 
+  #     Body = image_bytes.getvalue()
+  #   )
+  #   
+  #   # 2. Mentés az adatbázisba (az AI válasszal kiegészítve)
+  #   db_image = Image(
+  #     email = image.email,
+  #     model = image.model,
+  #     description = image.description,
+  #     image = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{filename}"
+  #   )
+  #   db.add(db_image)
+  #   db.commit()
+  #   db.refresh(db_image)
+    return "" # db_video
+
+  except Exception as e:
+    print(f"OpenAI hiba: {e}")
+    raise HTTPException(status_code = 500, detail = "Hiba az AI válasz generálása közben")
   
 
 @app.get("/chats/")
@@ -202,6 +262,23 @@ def read_images(
   images = db.query(Image).filter(Image.email == user_email).all()
   # print(images)
   return images
+
+
+
+@app.get("/videos/")
+def read_videos(
+    db: Session = Depends(get_db), 
+    authorization: str = Header(None)
+):
+  if not authorization or not authorization.startswith("Bearer "):
+    raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
+    
+  user_data = verify_google_token(authorization)
+  user_email = user_data['email'] # Biztonságos e-mail a Google-től
+  
+  videos = db.query(Video).filter(Video.email == user_email).all()
+  # print(videos)
+  return videos
 
 
 @app.get("/")

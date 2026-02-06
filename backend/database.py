@@ -28,5 +28,15 @@ class Image(Base):
   description = Column(Text)
   image = Column(Text)
   date = Column(DateTime(timezone = True), server_default = func.now()) # created_at jobb lenne date helyett
+  
+  
+class Video(Base):
+  __tablename__ = "videos"
+  id = Column(Integer, primary_key = True, index = True)
+  email = Column(Text, index = True)
+  model = Column(String(30))
+  content = Column(Text)
+  video = Column(Text)
+  date = Column(DateTime(timezone = True), server_default = func.now()) # created_at jobb lenne date helyett
 
 Base.metadata.create_all(bind = engine)

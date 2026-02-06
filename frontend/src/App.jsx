@@ -153,7 +153,6 @@ function App() {
         
         {/* BAL OLDAL: Űrlapok */}
         <section className="lg:col-span-1 space-y-6">
-          {/* Chat Form */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
             <h2 className="text-lg font-bold mb-4 border-b pb-2">Chat</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -169,7 +168,6 @@ function App() {
             </form>
           </div>
 
-          {/* Image Form */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
             <h2 className="text-lg font-bold mb-4 border-b pb-2">Image Generator</h2>
             <form onSubmit={handleImageSubmit} className="space-y-4">
@@ -201,7 +199,7 @@ function App() {
                 </div>
               )}
             </div>
-            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
               {chats.map(chat => (
                 <div key={chat.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                   <div className="flex justify-between text-[10px] text-gray-400 mb-2 font-bold uppercase">
@@ -215,29 +213,36 @@ function App() {
             </div>
           </div>
 
-          {/* Képek Galéria */}
-        <div className="mt-12">
-          <h2 className="text-xl font-bold mb-6">Generated Images</h2>
-          {(!images || images.length === 0) ? (
-            <p className="text-gray-400 italic">No images generated yet.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {images.map(img => (
-                <div key={img.id} className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                  <img 
-                    src={img.image} 
-                    alt={img.description} 
-                    className="w-full h-48 object-cover rounded-lg mb-2"
-                    onError={(e) => { e.target.src = 'https://via.placeholder.com'; }}
-                  />
-                  <p className="text-[11px] text-gray-600 italic px-1 line-clamp-2">{img.description}</p>
-                  <span className="text-[9px] text-gray-400 px-1">{new Date(img.date).toLocaleString('hu-HU')}</span>
-                </div>
-              ))}
+          {/* GALÉRIA KÓD BEILLESZTVE */}
+          <div>
+            <div className="flex items-center justify-between mb-6 border-b pb-2">
+              <h2 className="text-xl font-bold">Gallery</h2>
+              <span className="bg-slate-200 text-slate-600 text-xs px-2 py-1 rounded-full font-bold">{images.length} items</span>
             </div>
-          )}
-        </div>
 
+            {(!images || images.length === 0) ? (
+              <div className="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center text-slate-400 italic">
+                Your creative gallery is empty.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {images.map((img) => (
+                  <div key={img.id} className="group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all duration-300">
+                    <div className="relative aspect-square overflow-hidden bg-slate-100">
+                      <img src={img.image} alt={img.description} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                    </div>
+                    <div className="p-4">
+                      <p className="text-sm text-slate-700 font-medium line-clamp-2 min-h-[40px] mb-2 leading-relaxed">{img.description}</p>
+                      <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase">
+                        <span>{new Date(img.date).toLocaleDateString('hu-HU')}</span>
+                        <a href={img.image} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-700 transition">Full Size ↗</a>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </section>
       </main>
     </div>
@@ -248,7 +253,6 @@ export default App;
 
 
 /* 
-https://askaiwithpyreactfastapibackend.onrender.com
 Állapotkezelés: Komplexebb apphoz érdemes a React Query (TanStack) használata az adatok gyorsítótárazásához.
 Stílus: A gyors és modern kinézethez a Tailwind CSS a legnépszerűbb választás manapság.
 Interaktivitás: Ha valódi AI választ szeretnél, a create_chat hívás előtt hívd meg az OpenAI vagy Anthropic API-ját.*/
