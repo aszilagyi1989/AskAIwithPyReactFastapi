@@ -200,7 +200,7 @@ def read_images(
   user_email = user_data['email'] # Biztonságos e-mail a Google-től
   
   images = db.query(Image).all() # .filter(Image.email == user_email)
-    
+  print(images)
   return images
 
 

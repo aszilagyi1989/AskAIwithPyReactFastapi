@@ -53,6 +53,7 @@ function App() {
       const res = await axios.get(API_URL2, {
         headers: { Authorization: `Bearer ${idToken}` }
       });
+      console.log("Képek érkeztek:", res.data);
       setImages(Array.isArray(res.data) ? res.data : []);
     } catch (err) { console.error("Kép hiba:", err); }
   };
@@ -217,7 +218,7 @@ function App() {
           {/* Képek Galéria */}
         <div className="mt-12">
           <h2 className="text-xl font-bold mb-6">Generated Images</h2>
-          {images.length === 0 ? (
+          {(!images || images.length === 0) ? (
             <p className="text-gray-400 italic">No images generated yet.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
