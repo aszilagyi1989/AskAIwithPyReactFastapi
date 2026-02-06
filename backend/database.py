@@ -13,7 +13,7 @@ Base = declarative_base()
 class Chat(Base):
   __tablename__ = "chats"
   id = Column(Integer, primary_key = True, index = True)
-  email = Column(Text)
+  email = Column(Text, index = True)
   model = Column(String(30))
   question = Column(Text)
   answer = Column(Text)

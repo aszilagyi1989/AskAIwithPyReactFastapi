@@ -89,8 +89,20 @@ def create_chat(
 
 
 @app.get("/chats/")
-def read_chats(db: Session = Depends(get_db)):
-  return db.query(Chat).all()
+def read_chats(
+    db: Session = Depends(get_db), 
+    authorization: str = Header(None)
+):
+  if not authorization or not authorization.startswith("Bearer "):
+    raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
+    
+  user_data = verify_google_token(authorization)
+  user_email = user_data['email'] # Biztonságos e-mail a Google-től
+
+  chats = db.query(Chat).filter(Chat.email == user_email).all()
+    
+  return chats
+
 
 @app.get("/")
 def home():

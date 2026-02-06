@@ -57,6 +57,12 @@ function App() {
       setLoading(false);
     }
   };
+  
+  useEffect(() => {
+    if (idToken) {
+      fetchChats();
+    }
+  }, [idToken]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
