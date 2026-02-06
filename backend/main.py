@@ -63,11 +63,16 @@ def create_chat(
     raise HTTPException(status_code = 403, detail = "Emailek nem egyeznek")
 
   try:
+    
+    if chat.model != "gpt-5.2":
+      degree = 0.1
+    else:
+      degree = 0
     # 1. AI Válasz generálása
     response = client.chat.completions.create(
       model = chat.model, 
       messages = [{"role": "system", "content": "You are a helpful assistant. Answer as short as possible."}, {"role": "user", "content": chat.question}], 
-      temperature = 0
+      temperature = degree
     )
     ai_answer = response.choices[0].message.content
     

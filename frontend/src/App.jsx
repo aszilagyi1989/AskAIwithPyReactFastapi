@@ -58,6 +58,38 @@ function App() {
     }
   };
   
+  const downloadCSV = () => {
+  
+    if (chats.length === 0) return alert("Nincs letölthető adat!");
+
+    // Fejléc és az adatok összeállítása pontosvesszővel (;) elválasztva
+    const header = ["Dátum", "Modell", "Kérdés", "Válasz"];
+    const rows = chats.map(chat => [
+      new Date(chat.date).toLocaleString('hu-HU'),
+      chat.model,
+      // Idézőjelek közé tesszük a szöveget, hogy a benne lévő ; ne törje meg a fájlt
+      `"${chat.question.replace(/"/g, '""')}"`, 
+      `"${chat.answer.replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = [
+      header.join(";"), 
+      ...rows.map(row => row.join(";"))
+    ].join("\n");
+
+    // Blob létrehozása és letöltés
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `chat_history_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+  };
+  
   useEffect(() => {
     if (idToken) {
       fetchChats();
@@ -105,12 +137,17 @@ function App() {
 
         {/* Adatbázis Lista */}
         <section className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold">Messages</h2>
+          <div className = "flex justify-between items-center mb-6">
+            <h2 className = "text-xl font-bold">Messages</h2>
             {user && (
-              <button onClick={fetchChats} disabled={fetching} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                {fetching ? 'Loading...' : 'Data fetching'}
-              </button>
+              <div className = "flex gap-2">
+                <button onClick = {downloadCSV} className = "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                  CSV Letöltés
+                </button>
+                <button onClick = {fetchChats} disabled={fetching} className="bg-emerald-600 hover: bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                  {fetching ? 'Loading...' : 'Data fetching'}
+                </button>
+              </div>
             )}
           </div>
 
