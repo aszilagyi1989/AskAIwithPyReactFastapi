@@ -13,6 +13,7 @@ from botocore.exceptions import NoCredentialsError
 from datetime import datetime
 from io import BytesIO
 import base64
+import requests
 
 
 GOOGLE_CLIENT_ID = os.environ.get("CLIENT_ID")

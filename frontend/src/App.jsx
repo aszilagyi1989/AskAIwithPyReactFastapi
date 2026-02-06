@@ -215,17 +215,27 @@ function App() {
           </div>
 
           {/* Képek Galéria */}
-          <div>
-            <h2 className="text-xl font-bold mb-6">Generated Images</h2>
+        <div className="mt-12">
+          <h2 className="text-xl font-bold mb-6">Generated Images</h2>
+          {images.length === 0 ? (
+            <p className="text-gray-400 italic">No images generated yet.</p>
+          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {images.map(img => (
                 <div key={img.id} className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                  <img src={img.image} alt={img.description} className="w-full h-48 object-cover rounded-lg mb-2" />
+                  <img 
+                    src={img.image} 
+                    alt={img.description} 
+                    className="w-full h-48 object-cover rounded-lg mb-2"
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com'; }}
+                  />
                   <p className="text-[11px] text-gray-600 italic px-1 line-clamp-2">{img.description}</p>
+                  <span className="text-[9px] text-gray-400 px-1">{new Date(img.date).toLocaleString('hu-HU')}</span>
                 </div>
               ))}
             </div>
-          </div>
+          )}
+        </div>
 
         </section>
       </main>
