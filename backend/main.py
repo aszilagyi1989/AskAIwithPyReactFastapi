@@ -198,8 +198,8 @@ def read_images(
     
   user_data = verify_google_token(authorization)
   user_email = user_data['email'] # Biztonságos e-mail a Google-től
-
-  images = db.query(Image).filter(Image.email == user_email).all()
+  
+  images = db.query(Image).all() # .filter(Image.email == user_email)
     
   return images
 
