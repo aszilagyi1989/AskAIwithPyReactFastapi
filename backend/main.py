@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from database import SessionLocal, Chat
+from database import SessionLocal, Chat, Image
 from pydantic import BaseModel
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
@@ -199,8 +199,8 @@ def read_images(
   user_data = verify_google_token(authorization)
   user_email = user_data['email'] # Biztonságos e-mail a Google-től
   
-  images = db.query(Image).all() # .filter(Image.email == user_email)
-  print(images)
+  images = db.query(Image).filter(Image.email == user_email).all()
+  # print(images)
   return images
 
 
