@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, Chat
 from pydantic import BaseModel
 from google.oauth2 import id_token
-from google.auth.transport import requests
+from google.auth.transport import requests as google_requests
 import os
 from openai import OpenAI
 import boto3
@@ -13,7 +13,7 @@ from botocore.exceptions import NoCredentialsError
 from datetime import datetime
 from io import BytesIO
 import base64
-import requests
+import requests as py_requests
 
 
 GOOGLE_CLIENT_ID = os.environ.get("CLIENT_ID")
@@ -60,7 +60,7 @@ def get_db():
 def verify_google_token(token: str):
   try:
     actual_token = token.replace("Bearer ", "")
-    idinfo = id_token.verify_oauth2_token(actual_token, requests.Request(), GOOGLE_CLIENT_ID)
+    idinfo = id_token.verify_oauth2_token(actual_token, google_requests.Request(), GOOGLE_CLIENT_ID)
     return idinfo
   except Exception as e:
     print(f"Token hiba: {str(e)}") # Ez megjelenik a Render logban!
@@ -142,7 +142,7 @@ def create_image(
     
     if image.model == 'dall-e-3':
       link = response.data[0].url
-      r = requests.get(link)
+      r = py_requests.get(link)
       image_bytes = BytesIO(r.content)
     else:
       image_base64 = response.data[0].b64_json
