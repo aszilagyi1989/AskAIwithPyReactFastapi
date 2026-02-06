@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 
 // Figyelem: A végén ott kell legyen a /chats/
 const API_URL = "https://askaiwithpyreactfastapibackend.onrender.com/chats/";
+const API_URL2 = "https://askaiwithpyreactfastapibackend.onrender.com/images/";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -49,10 +50,10 @@ function App() {
   const fetchImages = async () => {
     if (!idToken) return;
     try {
-      const res = await axios.get("https://askaiwithpyreactfastapibackend.onrender.com", {
+      const res = await axios.get(API_URL2, {
         headers: { Authorization: `Bearer ${idToken}` }
       });
-      setImages(res.data);
+      setImages(Array.isArray(res.data) ? res.data : []);
     } catch (err) { console.error("Kép hiba:", err); }
   };
 
@@ -71,6 +72,23 @@ function App() {
       alert("Hiba történt a generálás során.");
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const handleImageSubmit = async (e) => {
+    e.preventDefault();
+    setImageLoading(true);
+    try {
+      await axios.post(API_URL2, imageFormData, {
+        headers: { Authorization: `Bearer ${idToken}` }
+      });
+      setImageFormData(prev => ({ ...prev, description: '' }));
+      alert("Kép elkészült!");
+      fetchImages();
+    } catch (err) {
+        alert("Hiba a képgenerálásnál.");
+    } finally {
+        setImageLoading(false);
     }
   };
   
@@ -104,23 +122,6 @@ function App() {
     link.click();
     document.body.removeChild(link);
     
-  };
-  
-  const handleImageSubmit = async (e) => {
-    e.preventDefault();
-    setImageLoading(true);
-    try {
-      await axios.post("https://askaiwithpyreactfastapibackend.onrender.com", imageFormData, {
-        headers: { Authorization: `Bearer ${idToken}` }
-      });
-      setImageFormData(prev => ({ ...prev, description: '' }));
-      alert("Kép elkészült!");
-      fetchImages();
-    } catch (err) {
-      alert("Hiba a képgenerálásnál.");
-    } finally {
-      setImageLoading(false);
-    }
   };
   
   useEffect(() => {
@@ -197,36 +198,35 @@ function App() {
               </div>
             ))}
           </div>
+          
+            {/* Képgeneráló Form */}
+          <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-6">
+            <h2 className="text-lg font-bold mb-4">Image Generator</h2>
+            <form onSubmit={handleImageSubmit} className="space-y-4">
+              <select className="w-full p-2 border rounded" value={imageFormData.model} onChange={e => setImageFormData({...imageFormData, model: e.target.value})}>
+                <option value="dall-e-3">DALL-E 3</option>
+                <option value="chatgpt-image-latest">chatgpt-image-latest</option>
+                <option value="gpt-image-1.5">gpt-image-1.5</option>
+                <option value="gpt-image-1">gpt-image-1</option>
+                <option value="gpt-image-1-mini">gpt-image-1-mini</option>
+              </select>
+              <textarea placeholder="Kép leírása..." className="w-full p-2 border rounded" value={imageFormData.description} onChange={e => setImageFormData({...imageFormData, description: e.target.value})} required />
+              <button disabled={!user || imageLoading} className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">
+                {imageLoading ? 'Generating...' : 'Generate Image'}
+              </button>
+            </form>
+          </section>
+          
+          {/* Galéria megjelenítése */}
+          <div className="grid grid-cols-2 gap-4 mt-8">
+            {images.map(img => (
+              <div key={img.id} className="border rounded-xl overflow-hidden bg-white shadow-sm">
+                <img src={img.image} alt={img.description} className="w-full h-48 object-cover" />
+                <div className="p-2 text-xs text-gray-500">{img.description}</div>
+              </div>
+            ))}
+          </div>
         </section>
-        
-        {/* Képgeneráló Form */}
-        <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-6">
-          <h2 className="text-lg font-bold mb-4">Image Generator</h2>
-          <form onSubmit={handleImageSubmit} className="space-y-4">
-            <select className="w-full p-2 border rounded" value={imageFormData.model} onChange={e => setImageFormData({...imageFormData, model: e.target.value})}>
-              <option value="dall-e-3">DALL-E 3</option>
-              <option value="chatgpt-image-latest">chatgpt-image-latest</option>
-              <option value="gpt-image-1.5">gpt-image-1.5</option>
-              <option value="gpt-image-1">gpt-image-1</option>
-              <option value="gpt-image-1-mini">gpt-image-1-mini</option>
-            </select>
-            <textarea placeholder="Kép leírása..." className="w-full p-2 border rounded" value={imageFormData.description} onChange={e => setImageFormData({...imageFormData, description: e.target.value})} required />
-            <button disabled={!user || imageLoading} className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">
-              {imageLoading ? 'Generating...' : 'Generate Image'}
-            </button>
-          </form>
-        </section>
-        
-        {/* Galéria megjelenítése */}
-        <div className="grid grid-cols-2 gap-4 mt-8">
-          {images.map(img => (
-            <div key={img.id} className="border rounded-xl overflow-hidden bg-white shadow-sm">
-              <img src={img.image} alt={img.description} className="w-full h-48 object-cover" />
-              <div className="p-2 text-xs text-gray-500">{img.description}</div>
-            </div>
-          ))}
-        </div>
-        
       </main>
     </div>
   );
