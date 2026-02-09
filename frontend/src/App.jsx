@@ -30,6 +30,8 @@ function App() {
     email: '', model: 'sora-2', duration: 4, content: ''
   });
 
+  const [activeTab, setActiveTab] = useState('chat');
+
   const handleSuccess = (credentialResponse) => {
     const token = credentialResponse.credential;
     const decoded = jwtDecode(token);
@@ -178,145 +180,155 @@ function App() {
           ) : (
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">{user.name}</span>
-              <button onClick={() => { googleLogout(); setUser(null); setIdToken(null); setChats([]); setImages([]); }} 
+              <button onClick={() => { googleLogout(); setUser(null); setIdToken(null); setChats([]); setImages([]); setVideos([]); }} 
                       className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Kijelentkezés</button>
             </div>
           )}
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 grid lg:grid-cols-3 gap-8">
-        
-        {/* BAL OLDAL: Űrlapok */}
-        <section className="lg:col-span-1 space-y-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 className="text-lg font-bold mb-4 border-b pb-2">Chat</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input className="w-full p-2 border rounded bg-gray-100 outline-none text-xs" value={formData.email} readOnly />
-              <select className="w-full p-2 border rounded outline-none" value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})}>
-                <option value="gpt-4o-mini">gpt-4o-mini</option>
-                <option value="gpt-4o">gpt-4o</option>
-              </select>
-              <textarea placeholder="Kérdés" className="w-full p-2 border rounded h-20 outline-none" value={formData.question} onChange={e => setFormData({...formData, question: e.target.value})} required />
-              <button disabled={!user || loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
-                {loading ? 'Thinking...' : 'Answer me!'}
-              </button>
-            </form>
-          </div>
+      <nav className="bg-white border-b sticky top-0 z-10">
+        <div className="container mx-auto px-4 flex gap-8">
+          {['chat', 'image', 'video'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-4 px-2 font-bold capitalize transition-colors border-b-2 ${
+                activeTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'
+              }`}
+            >
+              {tab === 'chat' ? '💬 Chat' : tab === 'image' ? '🖼️ Képek' : '🎥 Videók'}
+            </button>
+          ))}
+        </div>
+      </nav>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 className="text-lg font-bold mb-4 border-b pb-2">Image Generator</h2>
-            <form onSubmit={handleImageSubmit} className="space-y-4">
-              <select className="w-full p-2 border rounded outline-none" value={imageFormData.model} onChange={e => setImageFormData({...imageFormData, model: e.target.value})}>
-                <option value="dall-e-3">DALL-E 3</option>
-                <option value="dall-e-2">DALL-E 2</option>
-              </select>
-              <textarea placeholder="Kép leírása (Prompt)" className="w-full p-2 border rounded h-20 outline-none" value={imageFormData.description} onChange={e => setImageFormData({...imageFormData, description: e.target.value})} required />
-              <button disabled={!user || imageLoading} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
-                {imageLoading ? 'Generating...' : 'Generate Image'}
-              </button>
-            </form>
-          </div>
+      <main className="container mx-auto px-4 py-8">
+      {/* --- CHAT SZECKIÓ --- */}
+      {activeTab === 'chat' && (
+        <div className="grid lg:grid-cols-3 gap-8 animate-fadeIn">
+          <section className="lg:col-span-1">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 sticky top-24">
+              <h2 className="text-lg font-bold mb-4 border-b pb-2">AI Chat</h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input className="w-full p-2 border rounded bg-gray-100 outline-none text-xs" value={formData.email} readOnly />
+                <select className="w-full p-2 border rounded outline-none" value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})}>
+                  <option value="gpt-4o-mini">gpt-4o-mini</option>
+                  <option value="gpt-4o">gpt-4o</option>
+                </select>
+                <textarea placeholder="Kérdés" className="w-full p-2 border rounded h-24 outline-none" value={formData.question} onChange={e => setFormData({...formData, question: e.target.value})} required />
+                <button disabled={!user || loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
+                  {loading ? 'Gondolkodom...' : 'Kérdezz!'}
+                </button>
+              </form>
+            </div>
+          </section>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 className="text-lg font-bold mb-4 border-b pb-2">Video Generator</h2>
-            <form onSubmit={handleVideoSubmit} className="space-y-4">
-              <textarea placeholder="Videó leírása..." className="w-full p-2 border rounded h-20 outline-none" 
-                value={videoFormData.content} onChange={e => setVideoFormData({...videoFormData, content: e.target.value})} required />
-              <button disabled={!user || videoLoading} className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
-                {videoLoading ? 'Generating...' : 'Create Video'}
-              </button>
-            </form>
-          </div>
-
-        </section>
-
-        {/* JOBB OLDAL: Eredmények */}
-        <section className="lg:col-span-2 space-y-12">
-          
-          {/* Chat Üzenetek */}
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">Messages</h2>
+          <section className="lg:col-span-2 space-y-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Üzenetek</h2>
               {user && (
                 <div className="flex gap-2">
-                  <button onClick={downloadCSV} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">Download CSV</button>
-                  <button onClick={fetchChats} disabled={fetching} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition">
-                    {fetching ? 'Loading...' : 'Refresh'}
-                  </button>
+                  <button onClick={downloadCSV} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">CSV Letöltés</button>
+                  <button onClick={fetchChats} disabled={fetching} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm transition">Frissítés</button>
                 </div>
               )}
             </div>
-            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-              {chats.map(chat => (
-                <div key={chat.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                  <div className="flex justify-between text-[10px] text-gray-400 mb-2 font-bold uppercase">
-                    <span className="text-emerald-600">{chat.model}</span>
+            <div className="space-y-4">
+              {chats.map((chat) => (
+                <div key={chat.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex justify-between text-xs text-gray-400 mb-2">
+                    <span className="font-mono">{chat.model}</span>
                     <span>{new Date(chat.date).toLocaleString('hu-HU')}</span>
                   </div>
-                  <p className="font-semibold text-gray-800 mb-2">{chat.question}</p>
-                  <div className="bg-emerald-50 p-3 rounded-lg text-sm border-l-4 border-emerald-400">{chat.answer}</div>
+                  <p className="font-bold text-gray-800 mb-2">Q: {chat.question}</p>
+                  <p className="text-gray-600 bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">A: {chat.answer}</p>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
+        </div>
+      )}
 
-          {/* GALÉRIA KÓD BEILLESZTVE */}
-          <div>
-            <div className="flex items-center justify-between mb-6 border-b pb-2">
-              <h2 className="text-xl font-bold">Gallery</h2>
-              <span className="bg-slate-200 text-slate-600 text-xs px-2 py-1 rounded-full font-bold">{images.length} items</span>
+      {/* --- KÉP SZECKIÓ --- */}
+      {activeTab === 'image' && (
+        <div className="grid lg:grid-cols-3 gap-8 animate-fadeIn">
+          <section className="lg:col-span-1">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 sticky top-24">
+              <h2 className="text-lg font-bold mb-4 border-b pb-2">Képgeneráló</h2>
+              <form onSubmit={handleImageSubmit} className="space-y-4">
+                <select className="w-full p-2 border rounded outline-none" value={imageFormData.model} onChange={e => setImageFormData({...imageFormData, model: e.target.value})}>
+                  <option value="dall-e-3">DALL-E 3</option>
+                  <option value="dall-e-2">DALL-E 2</option>
+                </select>
+                <textarea placeholder="Kép leírása (Prompt)" className="w-full p-2 border rounded h-24 outline-none" value={imageFormData.description} onChange={e => setImageFormData({...imageFormData, description: e.target.value})} required />
+                <button disabled={!user || imageLoading} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
+                  {imageLoading ? 'Generálás...' : 'Kép készítése'}
+                </button>
+              </form>
             </div>
+          </section>
 
-            {(!images || images.length === 0) ? (
-              <div className="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center text-slate-400 italic">
-                Your creative gallery is empty.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {images.map((img) => (
-                  <div key={img.id} className="group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all duration-300">
-                    <div className="relative aspect-square overflow-hidden bg-slate-100">
-                      <img src={img.image} alt={img.description} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                    </div>
-                    <div className="p-4">
-                      <p className="text-sm text-slate-700 font-medium line-clamp-2 min-h-[40px] mb-2 leading-relaxed">{img.description}</p>
-                      <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase">
-                        <span>{new Date(img.date).toLocaleDateString('hu-HU')}</span>
-                        <a href={img.image} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-700 transition">Full Size ↗</a>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <section className="lg:col-span-2">
+            <h2 className="text-xl font-bold mb-6">Generált Képek</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {images.map((img) => (
+                <div key={img.id} className="bg-white p-2 rounded-xl shadow-sm border group overflow-hidden">
+                  <img src={img.image} alt={img.description} className="w-full h-auto rounded-lg object-cover hover:scale-105 transition duration-300" />
+                  <p className="text-[10px] text-gray-500 mt-2 px-1 italic">{img.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
 
-          <div>
-            <h2 className="text-xl font-bold mb-6">Generated Videos</h2>
-            <div className="grid md:grid-cols-2 gap-4">
+      {/* --- VIDEÓ SZECKIÓ --- */}
+      {activeTab === 'video' && (
+        <div className="grid lg:grid-cols-3 gap-8 animate-fadeIn">
+          <section className="lg:col-span-1">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 sticky top-24">
+              <h2 className="text-lg font-bold mb-4 border-b pb-2">Videógeneráló</h2>
+              <form onSubmit={handleVideoSubmit} className="space-y-4">
+                <select className="w-full p-2 border rounded outline-none" value={videoFormData.model} onChange={e => setVideoFormData({...videoFormData, model: e.target.value})}>
+                  <option value="sora-1">OpenAI Sora</option>
+                  <option value="luma-dream">Luma Dream Machine</option>
+                </select>
+                <textarea placeholder="Milyen videót szeretnél?" className="w-full p-2 border rounded h-24 outline-none" value={videoFormData.content} onChange={e => setVideoFormData({...videoFormData, content: e.target.value})} required />
+                <button disabled={!user || videoLoading} className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
+                  {videoLoading ? 'Videó készül...' : 'Videó készítése'}
+                </button>
+              </form>
+            </div>
+          </section>
+
+          <section className="lg:col-span-2">
+            <h2 className="text-xl font-bold mb-6">Generált Videók</h2>
+            <div className="grid sm:grid-cols-2 gap-6">
               {videos.map((vid) => (
-                <div key={vid.id} className="bg-white p-2 rounded-xl shadow-sm border">
-                  <video controls className="w-full rounded-lg">
-                    <source src={vid.video} type="video/mp4" />
-                    A böngésződ nem támogatja a videólejátszást.
+                <div key={vid.id} className="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+                  <video controls className="w-full rounded-lg bg-black aspect-video" src={vid.video}>
+                    A böngésződ nem támogatja a videót.
                   </video>
-                  <p className="text-xs text-gray-500 mt-2">{vid.content}</p>
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{vid.model}</p>
+                    <p className="text-sm text-gray-700 mt-1 line-clamp-2">{vid.content}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-
-        </section>
-      </main>
-    </div>
-  );
-}
+          </section>
+        </div>
+      )}
+    </main>
+        </div>
+      );
+    }
 
 export default App;
 
 
-/* 
-Állapotkezelés: Komplexebb apphoz érdemes a React Query (TanStack) használata az adatok gyorsítótárazásához.
-Stílus: A gyors és modern kinézethez a Tailwind CSS a legnépszerűbb választás manapság.
-Interaktivitás: Ha valódi AI választ szeretnél, a create_chat hívás előtt hívd meg az OpenAI vagy Anthropic API-ját.*/
+    /* 
+    Állapotkezelés: Komplexebb apphoz érdemes a React Query (TanStack) használata az adatok gyorsítótárazásához.
+    Stílus: A gyors és modern kinézethez a Tailwind CSS a legnépszerűbb választás manapság.
+    Interaktivitás: Ha valódi AI választ szeretnél, a create_chat hívás előtt hívd meg az OpenAI vagy Anthropic API-ját.*/
