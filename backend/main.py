@@ -49,7 +49,9 @@ class ImageSchema(BaseModel):
 class VideoSchema(BaseModel):
   email: str
   model: str
+  duration: int
   content: str
+  
 
 
 def get_db():
@@ -180,52 +182,56 @@ def create_videos(
   db: Session = Depends(get_db), 
   authorization: str = Header(None) # Fejlécből olvassuk a tokent
 ):
-  print(f"DEBUG: Beérkező adat: {vidoe.dict()}")
+  print(f"DEBUG: Beérkező adat: {video.dict()}")
   if not authorization or not authorization.startswith("Bearer "):
     raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
   
   user_data = verify_google_token(authorization)
     
   # Biztonsági ellenőrzés: Csak a saját emailjével menthet
-  if user_data['email'] != image.email:
+  if user_data['email'] != video.email:
     raise HTTPException(status_code = 403, detail = "Emailek nem egyeznek")
 
   try:
-  #   
-  #   response = client.images.generate(
-  #     model = image.model, 
-  #     prompt = image.description
-  #   )
-  #   
-  #   now = datetime.now().strftime('%Y%m%d%H%M%S')
-  #   filename = 'image' + now + '.png'
-  #   
-  #   if image.model == 'dall-e-3':
-  #     link = response.data[0].url
-  #     r = py_requests.get(link)
-  #     image_bytes = BytesIO(r.content)
-  #   else:
-  #     image_base64 = response.data[0].b64_json
-  #     image_bytes = base64.b64decode(image_base64)
-  #     image_bytes = BytesIO(image_bytes)
-  #     
-  #   s3.put_object(
-  #     Bucket = 'askaiwithpy', 
-  #     Key = filename, 
-  #     Body = image_bytes.getvalue()
-  #   )
-  #   
-  #   # 2. Mentés az adatbázisba (az AI válasszal kiegészítve)
-  #   db_image = Image(
-  #     email = image.email,
-  #     model = image.model,
-  #     description = image.description,
-  #     image = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{filename}"
-  #   )
-  #   db.add(db_image)
-  #   db.commit()
-  #   db.refresh(db_image)
-    return "" # db_video
+    response = client.videos.create(
+      model = video.model,
+      prompt = video.content,
+      size = "1280x720",
+      seconds = video.duration
+    )
+  
+    completed_video = client.videos.retrieve(video.id)
+    print(completed_video)
+    while completed_video.status != "completed":
+      completed_video = client.videos.retrieve(video.id)
+      if completed_video.status == "failed":
+        print(f"This video can not be created: {completed_video}")
+        break
+      
+    if completed_video.status == "completed":
+      print(f"You can download this video: {video.id}.mp4")
+      video_content = client.videos.download_content(completed_video.id)
+      video_bytes = video_content.read()
+
+    s3.put_object(
+      Bucket = 'askaiwithpy',
+      Key = f"{video.id}",
+      Body = video_bytes,
+      ContentType = 'video/mp4'
+    )
+  
+    # 2. Mentés az adatbázisba (az AI válasszal kiegészítve)
+    db_video = Video(
+      email = video.email,
+      model = video.model,
+      content = video.content,
+      video = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{video.id}"
+    )
+    db.add(db_video)
+    db.commit()
+    db.refresh(db_video)
+    
+    return db_video
 
   except Exception as e:
     print(f"OpenAI hiba: {e}")

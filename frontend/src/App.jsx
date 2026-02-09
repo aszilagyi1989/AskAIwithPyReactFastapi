@@ -3,25 +3,33 @@ import axios from 'axios';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 
-// Figyelem: A végén ott kell legyen a /chats/
 const API_URL = "https://askaiwithpyreactfastapibackend.onrender.com/chats/";
 const API_URL2 = "https://askaiwithpyreactfastapibackend.onrender.com/images/";
+const API_URL3 = "https://askaiwithpyreactfastapibackend.onrender.com/videos/";
 
 function App() {
   const [user, setUser] = useState(null);
   const [idToken, setIdToken] = useState(null);
+
   const [chats, setChats] = useState([]);
   const [images, setImages] = useState([]);
+  const [videos, setVideos] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
+  
   const [formData, setFormData] = useState({
     email: '', model: 'gpt-5.2', question: '' 
   });
   const [imageFormData, setImageFormData] = useState({
     email: '', model: 'dall-e-3', description: '' 
   });
-/*, answer: ''*/
+  const [videoFormData, setVideoFormData] = useState({
+    email: '', model: 'sora-2', duration: 4, content: ''
+  });
+
   const handleSuccess = (credentialResponse) => {
     const token = credentialResponse.credential;
     const decoded = jwtDecode(token);
@@ -58,6 +66,16 @@ function App() {
     } catch (err) { console.error("Kép hiba:", err); }
   };
 
+  const fetchVideos = async () => {
+    if (!idToken) return;
+    try {
+      const res = await axios.get(API_URL3, {
+        headers: { Authorization: `Bearer ${idToken}` }
+      });
+      setVideos(Array.isArray(res.data) ? res.data : []);
+    } catch (err) { console.error("Videó lekérési hiba:", err); }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -92,6 +110,22 @@ function App() {
         setImageLoading(false);
     }
   };
+
+  const handleVideoSubmit = async (e) => {
+    e.preventDefault();
+    setVideoLoading(true);
+    try {
+      await axios.post(API_URL3, videoFormData, {
+        headers: { Authorization: `Bearer ${idToken}` }
+      });
+      setVideoFormData(prev => ({ ...prev, content: '' }));
+      alert("Videó generálása elindult! Ez eltarthat pár percig.");
+      fetchVideos();
+    } catch (err) {
+      alert("Hiba a videógenerálásnál.");
+    } finally {
+      setVideoLoading(false);
+  }
   
   const downloadCSV = () => {
   
@@ -129,6 +163,7 @@ function App() {
     if (idToken) {
       fetchChats();
       fetchImages();
+      fetchVideos();
     }
   }, [idToken]);
 
@@ -181,6 +216,18 @@ function App() {
               </button>
             </form>
           </div>
+
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 className="text-lg font-bold mb-4 border-b pb-2">Video Generator</h2>
+            <form onSubmit={handleVideoSubmit} className="space-y-4">
+              <textarea placeholder="Videó leírása..." className="w-full p-2 border rounded h-20 outline-none" 
+                value={videoFormData.content} onChange={e => setVideoFormData({...videoFormData, content: e.target.value})} required />
+              <button disabled={!user || videoLoading} className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
+                {videoLoading ? 'Generating...' : 'Create Video'}
+              </button>
+            </form>
+          </div>
+
         </section>
 
         {/* JOBB OLDAL: Eredmények */}
@@ -243,6 +290,22 @@ function App() {
               </div>
             )}
           </div>
+
+          <div>
+            <h2 className="text-xl font-bold mb-6">Generated Videos</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {videos.map((vid) => (
+                <div key={vid.id} className="bg-white p-2 rounded-xl shadow-sm border">
+                  <video controls className="w-full rounded-lg">
+                    <source src={vid.video} type="video/mp4" />
+                    A böngésződ nem támogatja a videólejátszást.
+                  </video>
+                  <p className="text-xs text-gray-500 mt-2">{vid.content}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </section>
       </main>
     </div>
