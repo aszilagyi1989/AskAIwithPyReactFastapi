@@ -125,6 +125,7 @@ function App() {
       alert("Hiba a videógenerálásnál.");
     } finally {
       setVideoLoading(false);
+    }
   }
   
   const downloadCSV = () => {
