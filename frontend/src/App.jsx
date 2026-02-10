@@ -50,7 +50,7 @@ function App() {
   }
 
   try {
-    const backendUrl = "https://askaiwithpyreactfastapibackend.onrender.com";
+    const backendUrl = "https://askaiwithpyreactfastapibackend.onrender.com/verify-login";
     console.log("Küldés ide:", backendUrl);
 
     // 2. Küldjük el a Google tokent és a reCAPTCHA tokent a backendnek
