@@ -18,20 +18,27 @@ import httpx
 
 
 GOOGLE_CLIENT_ID = os.environ.get("CLIENT_ID")
-# client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
 RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
 
 
 async def verify_recaptcha(token: str):
     url = "https://www.google.com/recaptcha/api/siteverify"
+    # A RECAPTCHA_SECRET_KEY-t a Google Admin Console-ból (Secret Key) kell venni!
     data = {
         "secret": RECAPTCHA_SECRET_KEY,
         "response": token
     }
     async with httpx.AsyncClient() as client:
-        response = await client.post(url, data=data)
-        result = response.json()
-        return result.get("success", False)
+        try:
+            response = await client.post(url, data=data)
+            result = response.json()
+            # Logoljuk a hibát, ha van, hogy lásd a Render logban
+            if not result.get("success"):
+                print(f"reCAPTCHA hiba: {result.get('error-codes')}")
+            return result.get("success", False)
+        except Exception as e:
+            print(f"Hálózati hiba a reCAPTCHA ellenőrzésekor: {e}")
+            return False
 
 s3 = boto3.client(
   's3',
@@ -70,6 +77,10 @@ class VideoSchema(BaseModel):
   duration: int
   content: str
   openaiapi_key: str
+
+class LoginSchema(BaseModel):
+  google_token: str
+  recaptcha_token: str
 
 
 def get_db():
@@ -341,13 +352,26 @@ def home():
     return {"status": "A backend fut!", "endpoint": "/chats/"}
 
 
-@app.post("/verify-login/")
-async def verify_login(payload: dict):
-    # 1. Verify reCAPTCHA first
-    is_human = await verify_recaptcha(payload.get("recaptcha_token"))
+@app.post("/verify-login")
+async def verify_login(data: LoginSchema):
+    # 1. reCAPTCHA ellenőrzése
+    is_human = await verify_recaptcha(data.recaptcha_token)
     if not is_human:
-        raise HTTPException(status_code=400, detail = "reCAPTCHA ellenőrzés sikertelen")
+        raise HTTPException(status_code = 400, detail = "reCAPTCHA ellenőrzés sikertelen")
 
-    # 2. Proceed with Google token verification
-    user_data = verify_google_token(payload.get("google_token"))
-    return user_data
+    # 2. Google Token ellenőrzése
+    try:
+        # A verify_google_token függvényedet használjuk
+        user_data = verify_google_token(data.google_token)
+        
+        # Ha ide eljut, minden rendben van
+        return {
+            "success": True, 
+            "message": "Sikeres ellenőrzés",
+            "user": {
+                "email": user_data.get("email"),
+                "name": user_data.get("name")
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Érvénytelen Google token: {str(e)}")
