@@ -318,17 +318,13 @@ function App() {
 }
 
 export default function AppWrapper() {
-  const clientID = import.meta.env?.VITE_GOOGLE_CLIENT_ID || process.env.REACT_APP_GOOGLE_CLIENT_ID;
+  const clientID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   
-  if (!clientID) {
-    return <div style={{color: "red", padding: "20px"}}>HIBA: Google Client ID hiányzik!</div>;
-  }
-
   return (
     <GoogleOAuthProvider 
       clientId={clientID}
-      onScriptLoadError={() => console.log("Google SDK betöltési hiba")}
-      onScriptLoadSuccess={() => console.log("Google SDK kész")}
+      // Ez segíthet a popup és az ablak közötti kapcsolatban
+      useOneTap={false} 
     >
       <App />
     </GoogleOAuthProvider>

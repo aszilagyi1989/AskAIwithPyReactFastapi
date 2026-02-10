@@ -20,7 +20,6 @@ import httpx
 GOOGLE_CLIENT_ID = os.environ.get("CLIENT_ID")
 RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
 
-
 async def verify_recaptcha(token: str):
     url = "https://www.google.com/recaptcha/api/siteverify"
     # A RECAPTCHA_SECRET_KEY-t a Google Admin Console-ból (Secret Key) kell venni!
