@@ -241,10 +241,10 @@ def create_videos(
 
 @app.get("/chats/")
 def read_chats(
-    start_date: Optional[date] = None, 
-    end_date: Optional[date] = None,
     db: Session = Depends(get_db), 
-    authorization: str = Header(None)
+    authorization: str = Header(None),
+    start_date: Optional[date] = None, 
+    end_date: Optional[date] = None
 ):
   if not authorization or not authorization.startswith("Bearer "):
     raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
@@ -254,12 +254,10 @@ def read_chats(
 
   query = db.query(Chat).filter(Chat.email == user_email)
 
-  # Apply date filters if they exist
   if start_date:
     query = query.filter(Chat.date >= start_date)
   if end_date:
-    # We add 1 day to end_date to include the entire last day
-    query = query.filter(Chat.date < end_date + timedelta(days=1))  
+    query = query.filter(Chat.date < end_date + timedelta(days = 1))  
   
   return query.order_by(Chat.date.desc()).all()
 
@@ -267,24 +265,33 @@ def read_chats(
 @app.get("/images/")
 def read_images(
     db: Session = Depends(get_db), 
-    authorization: str = Header(None)
+    authorization: str = Header(None),
+    start_date: Optional[date] = None, 
+    end_date: Optional[date] = None
 ):
   if not authorization or not authorization.startswith("Bearer "):
     raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
     
   user_data = verify_google_token(authorization)
   user_email = user_data['email'] # Biztonságos e-mail a Google-től
+
+  query = db.query(Image).filter(Image.email == user_email)
+
+  if start_date:
+    query = query.filter(Image.date >= start_date)
+  if end_date:
+    query = query.filter(Image.date < end_date + timedelta(days = 1))  
   
-  images = db.query(Image).filter(Image.email == user_email).all()
-  # print(images)
-  return images
+  return query.order_by(Image.date.desc()).all()
 
 
 
 @app.get("/videos/")
 def read_videos(
     db: Session = Depends(get_db), 
-    authorization: str = Header(None)
+    authorization: str = Header(None),
+    start_date: Optional[date] = None, 
+    end_date: Optional[date] = None
 ):
   if not authorization or not authorization.startswith("Bearer "):
     raise HTTPException(status_code = 401, detail = "Bejelentkezés szükséges")
@@ -292,9 +299,14 @@ def read_videos(
   user_data = verify_google_token(authorization)
   user_email = user_data['email'] # Biztonságos e-mail a Google-től
   
-  videos = db.query(Video).filter(Video.email == user_email).all()
-  # print(videos)
-  return videos
+  query = db.query(Video).filter(Video.email == user_email)
+
+  if start_date:
+    query = query.filter(Video.date >= start_date)
+  if end_date:
+    query = query.filter(Video.date < end_date + timedelta(days = 1))  
+  
+  return query.order_by(Video.date.desc()).all()
 
 
 @app.get("/")
