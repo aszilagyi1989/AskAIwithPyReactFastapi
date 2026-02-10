@@ -14,10 +14,25 @@ from typing import Optional
 from io import BytesIO
 import base64
 import requests as py_requests
+import httpx
 
 
 GOOGLE_CLIENT_ID = os.environ.get("CLIENT_ID")
 client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
+RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
+
+
+async def verify_recaptcha(token: str):
+    url = "https://www.google.com/recaptcha/api/siteverify"
+    data = {
+        "secret": RECAPTCHA_SECRET_KEY,
+        "response": token
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, data=data)
+        result = response.json()
+        return result.get("success", False)
+
 s3 = boto3.client(
   's3',
   aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID"),
@@ -210,17 +225,17 @@ def create_videos(
       seconds = video.duration
     )
   
-    completed_video = client.videos.retrieve(video.id)
+    completed_video = user_client.videos.retrieve(video.id)
     print(completed_video)
     while completed_video.status != "completed":
-      completed_video = client.videos.retrieve(video.id)
+      completed_video = user_client.videos.retrieve(video.id)
       if completed_video.status == "failed":
         print(f"This video can not be created: {completed_video}")
         break
       
     if completed_video.status == "completed":
       print(f"You can download this video: {video.id}.mp4")
-      video_content = client.videos.download_content(completed_video.id)
+      video_content = user_client.videos.download_content(completed_video.id)
       video_bytes = video_content.read()
 
     s3.put_object(
@@ -324,3 +339,15 @@ def read_videos(
 @app.get("/")
 def home():
     return {"status": "A backend fut!", "endpoint": "/chats/"}
+
+
+@app.post("/verify-login/")
+async def verify_login(payload: dict):
+    # 1. Verify reCAPTCHA first
+    is_human = await verify_recaptcha(payload.get("recaptcha_token"))
+    if not is_human:
+        raise HTTPException(status_code=400, detail = "reCAPTCHA ellenőrzés sikertelen")
+
+    # 2. Proceed with Google token verification
+    user_data = verify_google_token(payload.get("google_token"))
+    return user_data

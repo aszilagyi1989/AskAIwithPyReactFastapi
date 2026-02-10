@@ -1,6 +1,7 @@
 boto3
 fastapi
 google-auth
+httpx
 openai
 psycopg2
 pydantic
