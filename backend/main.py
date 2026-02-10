@@ -18,7 +18,7 @@ import httpx
 
 
 GOOGLE_CLIENT_ID = os.environ.get("CLIENT_ID")
-client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
+# client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
 RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
 
 
