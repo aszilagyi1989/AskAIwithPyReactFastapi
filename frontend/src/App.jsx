@@ -43,34 +43,28 @@ function App() {
   };
 
   const handleLoginSuccess = async (credentialResponse) => {
-    if (!captchaToken) {
-      alert("Kérjük, töltsd ki a reCAPTCHA-t!");
-      return;
-    }
+  try {
+    const res = await axios.post("https://askaiwithpyreactfastapibackend.onrender.com", {
+      google_token: credentialResponse.credential,
+      recaptcha_token: captchaToken
+    });
 
-    try {
-      const res = await axios.post(VERIFY_URL, {
-        google_token: credentialResponse.credential,
-        recaptcha_token: captchaToken
-      });
-
-      if (res.data.success) {
-        const decoded = jwtDecode(credentialResponse.credential);
-        setUser(decoded);
-        setIdToken(credentialResponse.credential);
-        setFormData(prev => ({ ...prev, email: decoded.email }));
-        setImageFormData(prev => ({ ...prev, email: decoded.email }));
-        setVideoFormData(prev => ({ ...prev, email: decoded.email }));
-      } else {
-        alert("Hiba: " + res.data.message);
-        captchaRef.current.reset();
-        setCaptchaToken(null);
-      }
-    } catch (error) {
-      alert("Szerver hiba a bejelentkezéskor.");
-      captchaRef.current.reset();
+    if (res.data.success) {
+      // Figyelem: a backend a res.data.user-ben küldi az adatokat!
+      const userData = res.data.user; 
+      setUser(userData);
+      setIdToken(credentialResponse.credential);
+      
+      setFormData(prev => ({ ...prev, email: userData.email }));
+      setImageFormData(prev => ({ ...prev, email: userData.email }));
+      setVideoFormData(prev => ({ ...prev, email: userData.email }));
     }
-  };
+  } catch (error) {
+    alert("Bejelentkezési hiba: " + (error.response?.data?.detail || "Ismeretlen hiba"));
+    captchaRef.current?.reset();
+    setCaptchaToken(null);
+  }
+};
 
   const handleLogout = () => {
     googleLogout();
