@@ -101,6 +101,7 @@ def verify_google_token(token: str):
 
 @app.post("/verify-login")
 async def verify_login(data: LoginSchema):
+    print("DEBUG: Verify login hívás érkezett!")
     # 1. reCAPTCHA ellenőrzése
     is_human = await verify_recaptcha(data.recaptcha_token)
     if not is_human:

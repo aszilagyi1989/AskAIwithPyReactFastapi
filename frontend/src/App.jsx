@@ -50,9 +50,12 @@ function App() {
   }
 
   try {
+    const backendUrl = "https://askaiwithpyreactfastapibackend.onrender.com";
+    console.log("Küldés ide:", backendUrl);
+
     // 2. Küldjük el a Google tokent és a reCAPTCHA tokent a backendnek
     // FONTOS: Az URL végén NINCS perjel (/), hogy elkerüljük a 405 Method Not Allowed hibát!
-    const res = await axios.post("https://askaiwithpyreactfastapibackend.onrender.com", {
+    const res = await axios.post(backendUrl, {
       google_token: credentialResponse.credential,
       recaptcha_token: captchaToken
     });
