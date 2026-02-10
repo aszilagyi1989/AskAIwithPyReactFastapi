@@ -9,7 +9,8 @@ import os
 from openai import OpenAI
 import boto3
 from botocore.exceptions import NoCredentialsError
-from datetime import datetime
+from datetime import date, datetime, timedelta
+from typing import Optional
 from io import BytesIO
 import base64
 import requests as py_requests
@@ -240,6 +241,8 @@ def create_videos(
 
 @app.get("/chats/")
 def read_chats(
+    start_date: Optional[date] = None, 
+    end_date: Optional[date] = None,
     db: Session = Depends(get_db), 
     authorization: str = Header(None)
 ):
@@ -249,9 +252,16 @@ def read_chats(
   user_data = verify_google_token(authorization)
   user_email = user_data['email'] # Biztonságos e-mail a Google-től
 
-  chats = db.query(Chat).filter(Chat.email == user_email).all()
-    
-  return chats
+  query = db.query(Chat).filter(Chat.email == user_email)
+
+  # Apply date filters if they exist
+  if start_date:
+    query = query.filter(Chat.date >= start_date)
+  if end_date:
+    # We add 1 day to end_date to include the entire last day
+    query = query.filter(Chat.date < end_date + timedelta(days=1))  
+  
+  return query.order_by(Chat.date.desc()).all()
 
 
 @app.get("/images/")
