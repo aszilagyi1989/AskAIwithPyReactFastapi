@@ -323,10 +323,17 @@ function App() {
 }
 
 export default function AppWrapper() {
-  const clientID = import.meta.env?.VITE_GOOGLE_CLIENT_ID;
-  
+  // Safe check for the Client ID to prevent crashes
+  if (!GOOGLE_CLIENT_ID) {
+    return (
+      <div className="p-10 text-red-600 font-bold">
+        Hiba: VITE_GOOGLE_CLIENT_ID nem található a környezeti változók között!
+      </div>
+    );
+  }
+
   return (
-    <GoogleOAuthProvider clientId={clientID}>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <App />
     </GoogleOAuthProvider>
   );
