@@ -43,25 +43,46 @@ function App() {
   };
 
   const handleLoginSuccess = async (credentialResponse) => {
+  // 1. Ellenőrizzük, hogy a felhasználó kipipálta-e a reCAPTCHA-t
+  if (!captchaToken) {
+    alert("Kérjük, töltsd ki a reCAPTCHA-t a továbblépéshez!");
+    return;
+  }
+
   try {
+    // 2. Küldjük el a Google tokent és a reCAPTCHA tokent a backendnek
+    // FONTOS: Az URL végén NINCS perjel (/), hogy elkerüljük a 405 Method Not Allowed hibát!
     const res = await axios.post("https://askaiwithpyreactfastapibackend.onrender.com", {
       google_token: credentialResponse.credential,
       recaptcha_token: captchaToken
     });
 
+    // 3. Ha a backend válasza sikeres (success: true)
     if (res.data.success) {
-      // Figyelem: a backend a res.data.user-ben küldi az adatokat!
-      const userData = res.data.user; 
+      // A backend a res.data.user objektumban küldi az adatokat
+      const userData = res.data.user;
+      
       setUser(userData);
       setIdToken(credentialResponse.credential);
       
+      // Automatikusan töltsük ki az e-mail mezőket a formokban
       setFormData(prev => ({ ...prev, email: userData.email }));
       setImageFormData(prev => ({ ...prev, email: userData.email }));
       setVideoFormData(prev => ({ ...prev, email: userData.email }));
+      
+      console.log("Sikeres bejelentkezés:", userData.name);
     }
   } catch (error) {
-    alert("Bejelentkezési hiba: " + (error.response?.data?.detail || "Ismeretlen hiba"));
-    captchaRef.current?.reset();
+    // 4. Hibakezelés (pl. 405 Method Not Allowed vagy 401 Unauthorized)
+    console.error("Bejelentkezési hiba részletei:", error.response);
+    
+    const errorMsg = error.response?.data?.detail || "Ismeretlen hiba történt a bejelentkezés során.";
+    alert("Bejelentkezési hiba: " + errorMsg);
+    
+    // Hiba esetén alaphelyzetbe állítjuk a reCAPTCHA-t, hogy újra próbálkozhasson
+    if (captchaRef.current) {
+      captchaRef.current.reset();
+    }
     setCaptchaToken(null);
   }
 };
