@@ -181,7 +181,7 @@ function App() {
             <h2 className="text-2xl font-bold text-gray-800">Bejelentkezés</h2>
             <ReCAPTCHA ref={captchaRef} sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptchaChange} />
             <div className={!captchaToken ? "opacity-50 pointer-events-none" : ""}>
-                <GoogleLogin onSuccess={handleLoginSuccess} onError={() => alert("Login Failed")} ux_mode = "redirect" />
+                <GoogleLogin onSuccess={handleLoginSuccess} onError={() => alert("Login Failed")} ux_mode = "redirect" login_uri="https://askaiwithpy.onrender.com/" />
             </div>
             {!captchaToken && <p className="text-xs text-gray-400 italic">Oldd meg a CAPTCHA-t a belépéshez!</p>}
           </div>
