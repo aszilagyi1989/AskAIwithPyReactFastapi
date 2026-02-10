@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import { GoogleLogin, googleLogout, GoogleOAuthProvider } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -9,8 +9,8 @@ const API_URL2 = "https://askaiwithpyreactfastapibackend.onrender.com/images/";
 const API_URL3 = "https://askaiwithpyreactfastapibackend.onrender.com/videos/";
 
 const VERIFY_URL = "https://askaiwithpy.onrender.com";
-const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY;
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 function App() {
   const [user, setUser] = useState(null);
