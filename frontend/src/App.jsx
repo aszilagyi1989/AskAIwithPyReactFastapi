@@ -181,7 +181,7 @@ function App() {
             <h2 className="text-2xl font-bold text-gray-800">Bejelentkezés</h2>
             <ReCAPTCHA ref={captchaRef} sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptchaChange} />
             <div className={!captchaToken ? "opacity-50 pointer-events-none" : ""}>
-                <GoogleLogin onSuccess={handleLoginSuccess} onError={() => alert("Login Failed")} ux_mode = "redirect" login_uri="https://askaiwithpy.onrender.com/" />
+                <GoogleLogin onSuccess={handleLoginSuccess} onError={() => alert("Login Failed")} />
             </div>
             {!captchaToken && <p className="text-xs text-gray-400 italic">Oldd meg a CAPTCHA-t a belépéshez!</p>}
           </div>
@@ -324,17 +324,18 @@ function App() {
 }
 
 export default function AppWrapper() {
-  // Safe check for the Client ID to prevent crashes
-  if (!GOOGLE_CLIENT_ID) {
-    return (
-      <div className="p-10 text-red-600 font-bold">
-        Hiba: VITE_GOOGLE_CLIENT_ID nem található a környezeti változók között!
-      </div>
-    );
+  const clientID = import.meta.env?.VITE_GOOGLE_CLIENT_ID || process.env.REACT_APP_GOOGLE_CLIENT_ID;
+  
+  if (!clientID) {
+    return <div style={{color: "red", padding: "20px"}}>HIBA: Google Client ID hiányzik!</div>;
   }
 
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider 
+      clientId={clientID}
+      onScriptLoadError={() => console.log("Google SDK betöltési hiba")}
+      onScriptLoadSuccess={() => console.log("Google SDK kész")}
+    >
       <App />
     </GoogleOAuthProvider>
   );
