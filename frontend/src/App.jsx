@@ -323,8 +323,10 @@ function App() {
 }
 
 export default function AppWrapper() {
+  const clientID = import.meta.env?.VITE_GOOGLE_CLIENT_ID;
+  
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={clientID}>
       <App />
     </GoogleOAuthProvider>
   );
