@@ -41,18 +41,20 @@ class ChatSchema(BaseModel):
   email: str
   model: str
   question: str
+  openaiapi_key: str
 
 class ImageSchema(BaseModel):
   email: str
   model: str
   description: str
+  openaiapi_key: str
   
 class VideoSchema(BaseModel):
   email: str
   model: str
   duration: int
   content: str
-  
+  openaiapi_key: str
 
 
 def get_db():
@@ -94,8 +96,10 @@ def create_chat(
       degree = 1
     else:
       degree = 0
+
+    user_client = OpenAI(api_key = chat.openaiapi_key)
       
-    response = client.chat.completions.create(
+    response = user_client.chat.completions.create(
       model = chat.model, 
       messages = [{"role": "system", "content": "You are a helpful assistant. Answer as short as possible."}, {"role": "user", "content": chat.question}], 
       temperature = degree
@@ -137,7 +141,9 @@ def create_image(
 
   try:
     
-    response = client.images.generate(
+    user_client = OpenAI(api_key = image.openaiapi_key)
+
+    response = user_client.images.generate(
       model = image.model, 
       prompt = image.description
     )
@@ -194,7 +200,10 @@ def create_videos(
     raise HTTPException(status_code = 403, detail = "Emailek nem egyeznek")
 
   try:
-    response = client.videos.create(
+
+    user_client = OpenAI(api_key = video.openaiapi_key)
+
+    response = user_client.videos.create(
       model = video.model,
       prompt = video.content,
       size = "1280x720",
@@ -243,6 +252,7 @@ def create_videos(
 def read_chats(
     db: Session = Depends(get_db), 
     authorization: str = Header(None),
+    openaiapi_key: str = None,
     start_date: Optional[date] = None, 
     end_date: Optional[date] = None
 ):
@@ -266,6 +276,7 @@ def read_chats(
 def read_images(
     db: Session = Depends(get_db), 
     authorization: str = Header(None),
+    openaiapi_key: str = None,
     start_date: Optional[date] = None, 
     end_date: Optional[date] = None
 ):
@@ -290,6 +301,7 @@ def read_images(
 def read_videos(
     db: Session = Depends(get_db), 
     authorization: str = Header(None),
+    openaiapi_key: str = None,
     start_date: Optional[date] = None, 
     end_date: Optional[date] = None
 ):

@@ -23,6 +23,9 @@ function App() {
   // --- NEW: Date Filter States ---
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  const [apiKey, setApiKey] = useState('');
+  
   
   const [formData, setFormData] = useState({
     email: '', model: 'gpt-4o-mini', question: '' 
@@ -95,9 +98,10 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(!apiKey) return alert("Kérlek add meg az OpenAI API kulcsodat!");
     setLoading(true);
     try {
-      await axios.post(API_URL, formData, { headers: { Authorization: `Bearer ${idToken}` } });
+      await axios.post(API_URL, { formData, openaiapi_key: apiKey }, { headers: { Authorization: `Bearer ${idToken}` } });
       setFormData(prev => ({ ...prev, question: ''})); 
       fetchChats();
     } catch (err) { alert("Hiba a chat során."); } finally { setLoading(false); }
@@ -190,6 +194,18 @@ function App() {
                </div>
                <button onClick={handleGlobalFilter} className="bg-slate-800 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-black transition shadow-md">Szűrés</button>
                <button onClick={() => { setStartDate(''); setEndDate(''); setTimeout(handleGlobalFilter, 10); }} className="text-gray-400 text-xs hover:text-red-500 transition underline mb-2">Szűrők törlése</button>
+            </div>
+
+            {/* GLOBAL OPENAI API Key BAR */}
+            <div className="bg-white p-4 rounded-xl border border-red-100 shadow-sm mb-4">
+              <label className="text-xs font-bold text-red-500 block mb-1">OPENAI API KEY</label>
+              <input 
+                type="password" 
+                placeholder="sk-..." 
+                className="w-full p-2 border rounded text-sm" 
+                value={apiKey} 
+                onChange={(e) => setApiKey(e.target.value)} 
+              />
             </div>
 
             {activeTab === 'chat' && (
