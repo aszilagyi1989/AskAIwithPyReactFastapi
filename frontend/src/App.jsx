@@ -181,7 +181,7 @@ function App() {
             <h2 className="text-2xl font-bold text-gray-800">Bejelentkezés</h2>
             <ReCAPTCHA ref={captchaRef} sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptchaChange} />
             <div className={!captchaToken ? "opacity-50 pointer-events-none" : ""}>
-                <GoogleLogin onSuccess={handleLoginSuccess} onError={() => alert("Login Failed")} />
+                <GoogleLogin onSuccess={handleLoginSuccess} onError={() => alert("Login Failed")} ux_mode = "redirect" />
             </div>
             {!captchaToken && <p className="text-xs text-gray-400 italic">Oldd meg a CAPTCHA-t a belépéshez!</p>}
           </div>
