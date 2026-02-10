@@ -97,7 +97,31 @@ def verify_google_token(token: str):
   except Exception as e:
     print(f"Token hiba: {str(e)}") # Ez megjelenik a Render logban!
     raise HTTPException(status_code = 401, detail = f"Token hiba: {str(e)}")
-      
+
+
+@app.post("/verify-login")
+async def verify_login(data: LoginSchema):
+    # 1. reCAPTCHA ellenőrzése
+    is_human = await verify_recaptcha(data.recaptcha_token)
+    if not is_human:
+        raise HTTPException(status_code = 400, detail = "reCAPTCHA ellenőrzés sikertelen")
+
+    # 2. Google Token ellenőrzése
+    try:
+        # A verify_google_token függvényedet használjuk
+        user_data = verify_google_token(data.google_token)
+        
+        # Ha ide eljut, minden rendben van
+        return {
+            "success": True, 
+            "message": "Sikeres ellenőrzés",
+            "user": {
+                "email": user_data.get("email"),
+                "name": user_data.get("name")
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Érvénytelen Google token: {str(e)}")
       
 @app.post("/chats/")
 def create_chat(
@@ -349,28 +373,3 @@ def read_videos(
 @app.get("/")
 def home():
     return {"status": "A backend fut!", "endpoint": "/chats/"}
-
-
-@app.post("/verify-login")
-async def verify_login(data: LoginSchema):
-    # 1. reCAPTCHA ellenőrzése
-    is_human = await verify_recaptcha(data.recaptcha_token)
-    if not is_human:
-        raise HTTPException(status_code = 400, detail = "reCAPTCHA ellenőrzés sikertelen")
-
-    # 2. Google Token ellenőrzése
-    try:
-        # A verify_google_token függvényedet használjuk
-        user_data = verify_google_token(data.google_token)
-        
-        # Ha ide eljut, minden rendben van
-        return {
-            "success": True, 
-            "message": "Sikeres ellenőrzés",
-            "user": {
-                "email": user_data.get("email"),
-                "name": user_data.get("name")
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Érvénytelen Google token: {str(e)}")
