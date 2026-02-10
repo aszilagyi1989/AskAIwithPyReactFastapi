@@ -8,7 +8,7 @@ const API_URL = "https://askaiwithpyreactfastapibackend.onrender.com/chats/";
 const API_URL2 = "https://askaiwithpyreactfastapibackend.onrender.com/images/";
 const API_URL3 = "https://askaiwithpyreactfastapibackend.onrender.com/videos/";
 
-const VERIFY_URL = "https://askaiwithpyreactfastapibackend.onrender.com";
+const VERIFY_URL = "https://askaiwithpy.onrender.com";
 const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
