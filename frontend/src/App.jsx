@@ -9,8 +9,8 @@ const API_URL2 = "https://askaiwithpyreactfastapibackend.onrender.com/images/";
 const API_URL3 = "https://askaiwithpyreactfastapibackend.onrender.com/videos/";
 
 const VERIFY_URL = "https://askaiwithpy.onrender.com";
-const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+const RECAPTCHA_SITE_KEY = import.meta.env?.VITE_RECAPTCHA_SITE_KEY;
+const GOOGLE_CLIENT_ID = import.meta.env?.VITE_GOOGLE_CLIENT_ID;
 
 function App() {
   const [user, setUser] = useState(null);
