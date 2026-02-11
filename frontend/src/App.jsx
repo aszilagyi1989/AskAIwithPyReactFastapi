@@ -360,7 +360,15 @@ function App() {
                           <option value="sora-2-2025-12-08">sora-2-2025-12-08</option>
                           <option value="sora-2-2025-10-06">sora-2-2025-10-06</option>
                         </select>
-                        <input type="number" min="4" max="12" className="w-full p-2 border rounded" value={videoFormData.duration} onChange={e => setVideoFormData({...videoFormData, duration: parseInt(e.target.value)})} />
+                        <select 
+                          className="w-full p-2 border rounded text-sm bg-white" 
+                          value={videoFormData.duration} 
+                          onChange={e => setVideoFormData({...videoFormData, duration: e.target.value})}
+                        >
+                          <option value="4">4 seconds</option>
+                          <option value="8">8 seconds</option>
+                          <option value="12">12 seconds</option>
+                        </select>
                         <textarea placeholder="Videó tartalma..." className="w-full p-2 border rounded h-24" value={videoFormData.content} onChange={e => setVideoFormData({...videoFormData, content: e.target.value})} required />
                         <button disabled={videoLoading} className="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
                           {videoLoading ? 'Forgatok...' : 'Videó készítése'}
