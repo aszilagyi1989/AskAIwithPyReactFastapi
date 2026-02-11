@@ -213,7 +213,7 @@ def create_image(
     s3.put_object(
       Bucket = 'askaiwithpy', 
       Key = f"{image.email}/{filename}", 
-      GrantRead = f'emailAddress="{image.email}"',
+      # GrantRead = f'emailAddress="{image.email}"',
       Body = image_bytes.getvalue()
     )
     
@@ -276,7 +276,7 @@ def create_videos(
 
     s3.put_object(
       Bucket = 'askaiwithpy',
-      Key = f"{video.id}",
+      Key = f"{video.email}/{video.id}",
       Body = video_bytes,
       ContentType = 'video/mp4'
     )
@@ -286,7 +286,7 @@ def create_videos(
       email = video.email,
       model = video.model,
       content = video.content,
-      video = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{video.id}"
+      video = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{video.email}/{video.id}"
     )
     db.add(db_video)
     db.commit()
