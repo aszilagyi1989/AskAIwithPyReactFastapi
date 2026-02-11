@@ -32,9 +32,9 @@ function App() {
   const [endDate, setEndDate] = useState('');
   const [apiKey, setApiKey] = useState('');
 
-  const [formData, setFormData] = useState({ email: '', model: 'gpt-4o-mini', question: '' });
+  const [formData, setFormData] = useState({ email: '', model: 'gpt-5.2', question: '' });
   const [imageFormData, setImageFormData] = useState({ email: '', model: 'dall-e-3', description: '' });
-  const [videoFormData, setVideoFormData] = useState({ email: '', model: 'sora-1', duration: 4, content: '' });
+  const [videoFormData, setVideoFormData] = useState({ email: '', model: 'sora-2', duration: 4, content: '' });
 
   const [activeTab, setActiveTab] = useState('chat');
 
@@ -242,8 +242,10 @@ function App() {
                     <h2 className="text-lg font-bold mb-4 border-b pb-2">AI Chat</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <select className="w-full p-2 border rounded" value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})}>
-                        <option value="gpt-4o-mini">gpt-4o-mini</option>
-                        <option value="gpt-4o">gpt-4o</option>
+                        <option value="gpt-5.2">gpt-5.2</option>
+                        <option value="gpt-5">gpt-5</option>
+                        <option value="gpt-5-mini">gpt-5-mini</option>
+                        <option value="gpt-5-nano">gpt-5-nano</option>
                       </select>
                       <textarea placeholder="Kérdés..." className="w-full p-2 border rounded h-24" value={formData.question} onChange={e => setFormData({...formData, question: e.target.value})} required />
                       <button disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
@@ -278,8 +280,11 @@ function App() {
                       <h2 className="text-lg font-bold mb-4 border-b pb-2">Képgenerálás</h2>
                       <form onSubmit={handleImageSubmit} className="space-y-4">
                         <select className="w-full p-2 border rounded" value={imageFormData.model} onChange={e => setImageFormData({...imageFormData, model: e.target.value})}>
-                          <option value="dall-e-3">DALL-E 3</option>
-                          <option value="dall-e-2">DALL-E 2</option>
+                          <option value="dall-e-3">dall-e-3</option>
+                          <option value="chatgpt-image-latest">chatgpt-image-latest</option>
+                          <option value="gpt-image-1.5">gpt-image-1.5</option>
+                          <option value="gpt-image-1">gpt-image-1</option>
+                          <option value="gpt-image-1-mini">gpt-image-1-mini</option>
                         </select>
                         <textarea placeholder="Kép leírása..." className="w-full p-2 border rounded h-24" value={imageFormData.description} onChange={e => setImageFormData({...imageFormData, description: e.target.value})} required />
                         <button disabled={imageLoading} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
@@ -309,9 +314,12 @@ function App() {
                       <h2 className="text-lg font-bold mb-4 border-b pb-2">Videógenerálás</h2>
                       <form onSubmit={handleVideoSubmit} className="space-y-4">
                         <select className="w-full p-2 border rounded" value={videoFormData.model} onChange={e => setVideoFormData({...videoFormData, model: e.target.value})}>
-                          <option value="sora-1">OpenAI Sora</option>
+                          <option value="sora-2">sora-2</option>
+                          <option value="sora-2-pro">sora-2-pro</option>
+                          <option value="sora-2-2025-12-08">sora-2-2025-12-08</option>
+                          <option value="sora-2-2025-10-06">sora-2-2025-10-06</option>
                         </select>
-                        <input type="number" min="1" max="10" className="w-full p-2 border rounded" value={videoFormData.duration} onChange={e => setVideoFormData({...videoFormData, duration: parseInt(e.target.value)})} />
+                        <input type="number" min="4" max="12" className="w-full p-2 border rounded" value={videoFormData.duration} onChange={e => setVideoFormData({...videoFormData, duration: parseInt(e.target.value)})} />
                         <textarea placeholder="Videó tartalma..." className="w-full p-2 border rounded h-24" value={videoFormData.content} onChange={e => setVideoFormData({...videoFormData, content: e.target.value})} required />
                         <button disabled={videoLoading} className="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
                           {videoLoading ? 'Forgatok...' : 'Videó készítése'}
