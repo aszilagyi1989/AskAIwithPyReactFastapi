@@ -157,22 +157,51 @@ function App() {
   
   const handleImageSubmit = async (e) => {
     e.preventDefault();
+    if(!apiKey) return alert("Kérlek add meg az OpenAI API kulcsodat!");
     setImageLoading(true);
     try {
-      await axios.post(API_URL2, imageFormData, { headers: { Authorization: `Bearer ${idToken}` } });
+      // Kibontjuk a form adatait és mellétesszük a kulcsot
+      const payload = { 
+        ...imageFormData, 
+        openaiapi_key: apiKey 
+      };
+    
+      await axios.post(API_URL2, payload, { 
+        headers: { Authorization: `Bearer ${idToken}` } 
+      });
+    
       setImageFormData(prev => ({ ...prev, description: '' }));
       fetchImages();
-    } catch (err) { alert("Hiba a képnél."); } finally { setImageLoading(false); }
+    } catch (err) { 
+      console.error("Kép hiba:", err.response?.data);
+      alert("Hiba a kép generálása során."); 
+    } finally { 
+      setImageLoading(false); 
+    }
   };
 
   const handleVideoSubmit = async (e) => {
     e.preventDefault();
+    if(!apiKey) return alert("Kérlek add meg az OpenAI API kulcsodat!");
     setVideoLoading(true);
     try {
-      await axios.post(API_URL3, videoFormData, { headers: { Authorization: `Bearer ${idToken}` } });
+      const payload = { 
+        ...videoFormData, 
+        openaiapi_key: apiKey 
+      };
+
+      await axios.post(API_URL3, payload, { 
+        headers: { Authorization: `Bearer ${idToken}` } 
+      });
+    
       setVideoFormData(prev => ({ ...prev, content: '' }));
       fetchVideos();
-    } catch (err) { alert("Hiba a videónál."); } finally { setVideoLoading(false); }
+    } catch (err) { 
+      console.error("Videó hiba:", err.response?.data);
+      alert("Hiba a videó generálása során."); 
+    } finally { 
+      setVideoLoading(false); 
+    }
   };
 
   const downloadCSV = () => {
