@@ -73,7 +73,7 @@ class ImageSchema(BaseModel):
 class VideoSchema(BaseModel):
   email: str
   model: str
-  duration: int
+  duration: str
   content: str
   openaiapi_key: str
 
