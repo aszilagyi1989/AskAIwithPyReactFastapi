@@ -261,22 +261,22 @@ def create_videos(
       seconds = video.duration
     )
   
-    completed_video = user_client.videos.retrieve(video.id)
+    completed_video = user_client.videos.retrieve(response.id)
     print(completed_video)
     while completed_video.status != "completed":
-      completed_video = user_client.videos.retrieve(video.id)
+      completed_video = user_client.videos.retrieve(response.id)
       if completed_video.status == "failed":
         print(f"This video can not be created: {completed_video}")
         break
       
     if completed_video.status == "completed":
-      print(f"You can download this video: {video.id}.mp4")
+      print(f"You can download this video: {response.id}.mp4")
       video_content = user_client.videos.download_content(completed_video.id)
       video_bytes = video_content.read()
 
     s3.put_object(
       Bucket = 'askaiwithpy',
-      Key = f"{video.email}/{video.id}",
+      Key = f"{video.email}/{response.id}",
       Body = video_bytes,
       ContentType = 'video/mp4'
     )
@@ -286,7 +286,7 @@ def create_videos(
       email = video.email,
       model = video.model,
       content = video.content,
-      video = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{video.email}/{video.id}"
+      video = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{video.email}/{response.id}"
     )
     db.add(db_video)
     db.commit()
