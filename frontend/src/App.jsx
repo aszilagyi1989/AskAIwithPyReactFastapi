@@ -228,7 +228,7 @@ function App() {
           {user && (
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">{user.name}</span>
-              <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Log out</button>
+              <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Log Out</button>
             </div>
           )}
         </div>
@@ -237,12 +237,12 @@ function App() {
       <main className="container mx-auto px-4 py-8">
         {!user ? (
           <div className="flex flex-col items-center justify-center py-20 gap-6 bg-white rounded-3xl shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800">Log in</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Log In</h2>
             <ReCAPTCHA ref={captchaRef} sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptchaChange} />
             <div className={!captchaToken ? "opacity-50 pointer-events-none" : ""}>
                 <GoogleLogin onSuccess={handleLoginSuccess} onError={() => alert("Login Failed")} />
             </div>
-            {!captchaToken && <p className="text-xs text-gray-400 italic">Solve the captcha to log in!</p>}
+            {!captchaToken && <p className="text-xs text-gray-400 italic">Solve the captcha to Log In!</p>}
           </div>
         ) : (
           <>
@@ -261,11 +261,11 @@ function App() {
 
             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-end mb-4">
                <div className="flex flex-col">
-                 <label className="text-xs font-bold text-gray-500 mb-1">Start date</label>
+                 <label className="text-xs font-bold text-gray-500 mb-1">Start Date</label>
                  <input type="date" className="p-2 border rounded text-sm" value={startDate} onChange={e => setStartDate(e.target.value)} />
                </div>
                <div className="flex flex-col">
-                 <label className="text-xs font-bold text-gray-500 mb-1">End date</label>
+                 <label className="text-xs font-bold text-gray-500 mb-1">End Date</label>
                  <input type="date" className="p-2 border rounded text-sm" value={endDate} onChange={e => setEndDate(e.target.value)} />
                </div>
                <button onClick={() => { fetchChats(); fetchImages(); fetchVideos(); }} className="bg-slate-800 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-slate-700 transition">Filter</button>
@@ -318,7 +318,7 @@ function App() {
                <div className="grid lg:grid-cols-3 gap-8">
                   <section className="lg:col-span-1">
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 sticky top-24">
-                      <h2 className="text-lg font-bold mb-4 border-b pb-2">Create image</h2>
+                      <h2 className="text-lg font-bold mb-4 border-b pb-2">Create Image</h2>
                       <form onSubmit={handleImageSubmit} className="space-y-4">
                         <select className="w-full p-2 border rounded" value={imageFormData.model} onChange={e => setImageFormData({...imageFormData, model: e.target.value})}>
                           <option value="dall-e-3">dall-e-3</option>
@@ -329,7 +329,7 @@ function App() {
                         </select>
                         <textarea placeholder="Description..." className="w-full p-2 border rounded h-24" value={imageFormData.description} onChange={e => setImageFormData({...imageFormData, description: e.target.value})} required />
                         <button disabled={imageLoading} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
-                          {imageLoading ? 'Drawing... Please, be patient!' : 'Generate image'}
+                          {imageLoading ? 'Drawing... Please, be patient!' : 'Generate Image'}
                         </button>
                       </form>
                     </div>
@@ -352,7 +352,7 @@ function App() {
               <div className="grid lg:grid-cols-3 gap-8">
                   <section className="lg:col-span-1">
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 sticky top-24">
-                      <h2 className="text-lg font-bold mb-4 border-b pb-2">Create video</h2>
+                      <h2 className="text-lg font-bold mb-4 border-b pb-2">Create Video</h2>
                       <form onSubmit={handleVideoSubmit} className="space-y-4">
                         <select className="w-full p-2 border rounded" value={videoFormData.model} onChange={e => setVideoFormData({...videoFormData, model: e.target.value})}>
                           <option value="sora-2">sora-2</option>
@@ -371,7 +371,7 @@ function App() {
                         </select>
                         <textarea placeholder="Story of video..." className="w-full p-2 border rounded h-24" value={videoFormData.content} onChange={e => setVideoFormData({...videoFormData, content: e.target.value})} required />
                         <button disabled={videoLoading} className="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
-                          {videoLoading ? 'Shooting... Please, be very patient!' : 'Generate video'}
+                          {videoLoading ? 'Shooting... Please, be very patient!' : 'Generate Video'}
                         </button>
                       </form>
                     </div>
