@@ -34,7 +34,7 @@ function App() {
 
   const [formData, setFormData] = useState({ email: '', model: 'gpt-5.2', question: '' });
   const [imageFormData, setImageFormData] = useState({ email: '', model: 'dall-e-3', description: '' });
-  const [videoFormData, setVideoFormData] = useState({ email: '', model: 'sora-2', duration: 4, content: '' });
+  const [videoFormData, setVideoFormData] = useState({ email: '', model: 'sora-2', duration: '4', content: '' });
 
   const [activeTab, setActiveTab] = useState('chat');
 
