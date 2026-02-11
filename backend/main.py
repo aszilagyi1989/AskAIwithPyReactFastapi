@@ -212,7 +212,8 @@ def create_image(
       
     s3.put_object(
       Bucket = 'askaiwithpy', 
-      Key = filename, 
+      Key = f"{image.email}/{filename}", 
+      GrantRead = f'emailAddress="{image.email}"',
       Body = image_bytes.getvalue()
     )
     
@@ -221,7 +222,7 @@ def create_image(
       email = image.email,
       model = image.model,
       description = image.description,
-      image = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{filename}"
+      image = f"https://askaiwithpy.s3.eu-north-1.amazonaws.com/{image.email}/{filename}"
     )
     db.add(db_image)
     db.commit()
