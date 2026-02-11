@@ -137,10 +137,22 @@ function App() {
     if(!apiKey) return alert("Kérlek add meg az OpenAI API kulcsodat!");
     setLoading(true);
     try {
-      await axios.post(API_URL, { formData, openaiapi_key: apiKey }, { headers: { Authorization: `Bearer ${idToken}` } });
+      // Itt a változtatás: ...formData használata
+      await axios.post(API_URL, { 
+        ...formData,           // Kibontja az email, model, question mezőket
+        openaiapi_key: apiKey  // Mellérakja az API kulcsot
+      }, { 
+        headers: { Authorization: `Bearer ${idToken}` } 
+      });
+
       setFormData(prev => ({ ...prev, question: ''})); 
       fetchChats();
-    } catch (err) { alert("Hiba a chat során."); } finally { setLoading(false); }
+    } catch (err) { 
+      console.error(err.response?.data); // Így látod a pontos validációs hibát a konzolon
+      alert("Hiba a chat során."); 
+    } finally { 
+      setLoading(false); 
+    }
   };
   
   const handleImageSubmit = async (e) => {
