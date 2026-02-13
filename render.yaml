@@ -1,4 +1,5 @@
 services:
+# Backend szolgáltatás (már meglévő)
   - type: web
     name: fastapi-backend
     runtime: docker
@@ -8,3 +9,14 @@ services:
     envVars:
       - key: PORT
         value: 10000
+
+
+# Frontend szolgáltatás (új)
+  - type: web
+    name: react-frontend
+    runtime: docker
+    dockerContext: frontend
+    dockerfilePath: frontend/Dockerfile
+    envVars:
+      - key: VITE_API_URL
+        value: https://askaiwithpyreactfastapibackend.onrender.com
