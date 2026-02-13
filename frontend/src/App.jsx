@@ -224,11 +224,11 @@ function App() {
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
       <header className="bg-slate-900 text-white shadow-lg py-4">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold">Ask AI with Python</h1>
+          <h1 className="text-xl font-bold">AI History Cloud</h1>
           {user && (
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">{user.name}</span>
-              <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Log Out</button>
+              <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Sign Out</button>
             </div>
           )}
         </div>
@@ -237,7 +237,7 @@ function App() {
       <main className="container mx-auto px-4 py-8">
         {!user ? (
           <div className="flex flex-col items-center justify-center py-20 gap-6 bg-white rounded-3xl shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800">Log In</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Sign In</h2>
             <ReCAPTCHA ref={captchaRef} sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptchaChange} />
             <div className={!captchaToken ? "opacity-50 pointer-events-none" : ""}>
                 <GoogleLogin onSuccess={handleLoginSuccess} onError={() => alert("Login Failed")} />
@@ -290,7 +290,7 @@ function App() {
                       </select>
                       <textarea placeholder="Question..." className="w-full p-2 border rounded h-24" value={formData.question} onChange={e => setFormData({...formData, question: e.target.value})} required />
                       <button disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition disabled:bg-gray-300">
-                        {loading ? 'Thinking...' : 'Sending'}
+                        {loading ? 'Thinking...' : 'Answer me'}
                       </button>
                     </form>
                   </div>
