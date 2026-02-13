@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: fastapi-backend
+    runtime: docker
+    repo: https://github.com/aszilagyi1989/AskAIwithPyReactFastapi
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
+    envVars:
+      - key: PORT
+        value: 10000
